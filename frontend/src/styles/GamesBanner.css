@@ -1,0 +1,33 @@
+.games-banner {
+  background: transparent;
+  border: 1px solid #D5D1CB;
+  border-radius: 100px; /* Elegant pill shape */
+  padding: 12px 32px;
+  margin: 0 auto 48px auto;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #1A1817;
+}
+
+.games-banner:hover {
+  background: rgba(0,0,0,0.04);
+  border-color: #1A1817;
+}
+
+.games-icon {
+  color: #5A5551;
+}
+
+.games-text h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  font-family: var(--font-playfair), serif;
+  letter-spacing: 0.5px;
+  color: #2C2A29;
+}

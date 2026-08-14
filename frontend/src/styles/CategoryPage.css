@@ -1,0 +1,27 @@
+.category-page{
+    width:95%;
+    margin:auto;
+    padding:30px 0;
+}
+
+.back-button{
+    text-decoration:none;
+    color:#0f9d58;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.category-page h1{
+    margin:20px 0 30px;
+    font-size:38px;
+}
+
+.menu-grid{
+    display:grid;
+    grid-template-columns: 1fr; /* Single column list view as sketched */
+    gap: 0; /* Remove gap so borders touch */
+}
+
+.ad-section{
+    grid-column:1/-1;
+}

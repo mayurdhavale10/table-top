@@ -1,0 +1,82 @@
+.restaurant-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px 40px 20px;
+  background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=80');
+  background-size: cover;
+  background-position: center;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.header-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(50, 50, 50, 0.6); /* Gray film */
+  z-index: 1;
+}
+
+.restaurant-details {
+  position: relative;
+  z-index: 2;
+  color: white;
+}
+
+.restaurant-details h1 {
+  font-size: 48px;
+  margin-bottom: 12px;
+  letter-spacing: -1px;
+  color: #FFFFFF;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+
+.restaurant-details p {
+  color: #E5E5E5;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.restaurant-rating {
+  margin-top: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.restaurant-rating span {
+  color: #CCCCCC;
+  font-weight: 400;
+}
+
+@media (max-width: 600px) {
+  .restaurant-header {
+    border-radius: 0;
+    padding: 50px 16px 30px 16px;
+  }
+  .restaurant-details h1 {
+    font-size: 36px;
+  }
+  .restaurant-details p {
+    font-size: 11px;
+  }
+}

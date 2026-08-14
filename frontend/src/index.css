@@ -1,0 +1,30 @@
+body {
+  font-family: var(--font-inter), sans-serif;
+  background: #FAF8F5; /* Warm parchment off-white */
+  color: #2C2A29; /* Dark brown/gray */
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), serif;
+  font-weight: 700;
+  margin: 0;
+  color: #1A1817;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@media (max-width: 480px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+}

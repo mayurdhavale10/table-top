@@ -1,0 +1,458 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "Veg",
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"
+    },
+    {
+      "id": 2,
+      "name": "Non Veg",
+      "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591"
+    },
+    {
+      "id": 3,
+      "name": "Starters",
+      "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877"
+    },
+    {
+      "id": 4,
+      "name": "Pizza",
+      "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591"
+    },
+    {
+      "id": 5,
+      "name": "Burgers",
+      "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd"
+    },
+    {
+      "id": 6,
+      "name": "Pasta",
+      "image": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9"
+    },
+    {
+      "id": 7,
+      "name": "Drinks",
+      "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd"
+    },
+    {
+      "id": 8,
+      "name": "Desserts",
+      "image": "https://images.unsplash.com/photo-1563805042-7684c019e1cb"
+    }
+  ],
+  "menu": [
+    {
+      "id": 1,
+      "name": "Garlic Potato Shots",
+      "description": "Crispy potato bites tossed with garlic seasoning and herbs",
+      "price": 169,
+      "category": "Starters",
+      "type": "Veg",
+      "rating": 4.5,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
+      "calories": "approx 327 kcal",
+      "allergens": []
+    },
+    {
+      "id": 2,
+      "name": "French Fries",
+      "description": "Golden crispy fries served with classic seasoning",
+      "price": 119,
+      "category": "Starters",
+      "type": "Veg",
+      "rating": 4.4,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
+      "calories": "approx 498 kcal",
+      "allergens": []
+    },
+    {
+      "id": 3,
+      "name": "Peri Peri Fries",
+      "description": "Crispy fries coated with spicy peri peri masala",
+      "price": 149,
+      "category": "Starters",
+      "type": "Veg",
+      "rating": 4.6,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
+      "calories": "approx 375 kcal",
+      "allergens": []
+    },
+    {
+      "id": 4,
+      "name": "Cheese Fries",
+      "description": "Loaded fries topped with melted cheese",
+      "price": 169,
+      "category": "Starters",
+      "type": "Veg",
+      "rating": 4.7,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
+      "calories": "approx 300 kcal",
+      "allergens": [
+        "Soy"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Veg Nuggets",
+      "description": "Crunchy vegetable nuggets served with dip",
+      "price": 179,
+      "category": "Starters",
+      "type": "Veg",
+      "rating": 4.3,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1562967916-eb82221dfb92",
+      "calories": "approx 762 kcal",
+      "allergens": []
+    },
+    {
+      "id": 6,
+      "name": "Cheese Garlic Bread",
+      "description": "Fresh garlic bread topped with cheese and herbs",
+      "price": 199,
+      "category": "Starters",
+      "type": "Veg",
+      "rating": 4.6,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1619535860434-cf9b2d7b6a4b",
+      "calories": "approx 370 kcal",
+      "allergens": [
+        "Dairy"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Chicken Lollipop",
+      "description": "Spicy crispy chicken lollipop served hot",
+      "price": 279,
+      "category": "Starters",
+      "type": "Non Veg",
+      "rating": 4.7,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2",
+      "calories": "approx 241 kcal",
+      "allergens": []
+    },
+    {
+      "id": 8,
+      "name": "Chicken Wings",
+      "description": "Crispy chicken wings with signature sauce",
+      "price": 299,
+      "category": "Starters",
+      "type": "Non Veg",
+      "rating": 4.8,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2",
+      "calories": "approx 464 kcal",
+      "allergens": []
+    },
+    {
+      "id": 9,
+      "name": "Chicken Popcorn",
+      "description": "Crispy bite sized chicken pieces",
+      "price": 249,
+      "category": "Starters",
+      "type": "Non Veg",
+      "rating": 4.5,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2",
+      "calories": "approx 694 kcal",
+      "allergens": [
+        "Gluten"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Fish Fingers",
+      "description": "Golden crispy fish strips served with dip",
+      "price": 319,
+      "category": "Starters",
+      "type": "Non Veg",
+      "rating": 4.6,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1544982503-9f984c14501a",
+      "calories": "approx 753 kcal",
+      "allergens": [
+        "Soy",
+        "Nuts"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Margherita Pizza",
+      "description": "Classic Italian pizza with mozzarella cheese and basil",
+      "price": 299,
+      "category": "Pizza",
+      "type": "Veg",
+      "rating": 4.5,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591",
+      "calories": "approx 695 kcal",
+      "allergens": []
+    },
+    {
+      "id": 12,
+      "name": "Farmhouse Pizza",
+      "description": "Loaded with fresh vegetables, cheese and herbs",
+      "price": 399,
+      "category": "Pizza",
+      "type": "Veg",
+      "rating": 4.6,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
+      "calories": "approx 343 kcal",
+      "allergens": [
+        "Gluten"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Veggie Supreme",
+      "description": "Supreme pizza loaded with vegetables and cheese",
+      "price": 449,
+      "category": "Pizza",
+      "type": "Veg",
+      "rating": 4.7,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca",
+      "calories": "approx 571 kcal",
+      "allergens": [
+        "Gluten",
+        "Dairy"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Chicken BBQ Pizza",
+      "description": "Smoky BBQ chicken pizza with melted cheese",
+      "price": 499,
+      "category": "Pizza",
+      "type": "Non Veg",
+      "rating": 4.8,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1566843972142-a7fcb70de55a",
+      "calories": "approx 727 kcal",
+      "allergens": []
+    },
+    {
+      "id": 15,
+      "name": "Pepperoni Pizza",
+      "description": "Classic pepperoni slices with cheese",
+      "price": 549,
+      "category": "Pizza",
+      "type": "Non Veg",
+      "rating": 4.7,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1628840042765-356cda07504e",
+      "calories": "approx 450 kcal",
+      "allergens": []
+    },
+    {
+      "id": 16,
+      "name": "Veg Burger",
+      "description": "Veg patty burger with lettuce, cheese and sauce",
+      "price": 169,
+      "category": "Burgers",
+      "type": "Veg",
+      "rating": 4.4,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1520072959219-c595dc870360",
+      "calories": "approx 460 kcal",
+      "allergens": []
+    },
+    {
+      "id": 17,
+      "name": "Paneer Burger",
+      "description": "Soft paneer patty with creamy sauce and vegetables",
+      "price": 199,
+      "category": "Burgers",
+      "type": "Veg",
+      "rating": 4.6,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+      "calories": "approx 650 kcal",
+      "allergens": []
+    },
+    {
+      "id": 18,
+      "name": "Chicken Burger",
+      "description": "Juicy chicken patty with cheese and signature sauce",
+      "price": 229,
+      "category": "Burgers",
+      "type": "Non Veg",
+      "rating": 4.7,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+      "calories": "approx 192 kcal",
+      "allergens": [
+        "Nuts"
+      ]
+    },
+    {
+      "id": 19,
+      "name": "Double Chicken Burger",
+      "description": "Double chicken patty burger with extra cheese",
+      "price": 299,
+      "category": "Burgers",
+      "type": "Non Veg",
+      "rating": 4.8,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1553979459-d2229ba7433b",
+      "calories": "approx 395 kcal",
+      "allergens": [
+        "Soy"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Alfredo Pasta",
+      "description": "Creamy white sauce pasta with herbs and cheese",
+      "price": 299,
+      "category": "Pasta",
+      "type": "Veg",
+      "rating": 4.6,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601",
+      "calories": "approx 408 kcal",
+      "allergens": []
+    },
+    {
+      "id": 21,
+      "name": "Arrabbiata Pasta",
+      "description": "Spicy tomato sauce pasta with Italian herbs",
+      "price": 289,
+      "category": "Pasta",
+      "type": "Veg",
+      "rating": 4.5,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1551892374-ecf8754cf8b0",
+      "calories": "approx 763 kcal",
+      "allergens": [
+        "Gluten"
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Chicken Alfredo",
+      "description": "Creamy pasta loaded with grilled chicken pieces",
+      "price": 359,
+      "category": "Pasta",
+      "type": "Non Veg",
+      "rating": 4.7,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9",
+      "calories": "approx 575 kcal",
+      "allergens": []
+    },
+    {
+      "id": 23,
+      "name": "Cold Coffee",
+      "description": "Chilled creamy coffee blended with milk and ice cream",
+      "price": 149,
+      "category": "Drinks",
+      "type": "Veg",
+      "rating": 4.6,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735",
+      "calories": "approx 529 kcal",
+      "allergens": []
+    },
+    {
+      "id": 24,
+      "name": "Oreo Shake",
+      "description": "Thick Oreo chocolate shake with creamy texture",
+      "price": 189,
+      "category": "Drinks",
+      "type": "Veg",
+      "rating": 4.7,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc699",
+      "calories": "approx 503 kcal",
+      "allergens": []
+    },
+    {
+      "id": 25,
+      "name": "Virgin Mojito",
+      "description": "Refreshing mint and lime cooler with crushed ice",
+      "price": 159,
+      "category": "Drinks",
+      "type": "Veg",
+      "rating": 4.5,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc",
+      "calories": "approx 325 kcal",
+      "allergens": []
+    },
+    {
+      "id": 26,
+      "name": "Coca Cola",
+      "description": "Chilled soft drink served cold",
+      "price": 79,
+      "category": "Drinks",
+      "type": "Veg",
+      "rating": 4.3,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1629203851122-3726ecdf080e",
+      "calories": "approx 209 kcal",
+      "allergens": []
+    },
+    {
+      "id": 27,
+      "name": "Chocolate Brownie",
+      "description": "Warm fudgy chocolate brownie with rich cocoa flavour",
+      "price": 179,
+      "category": "Desserts",
+      "type": "Veg",
+      "rating": 4.8,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476d",
+      "calories": "approx 739 kcal",
+      "allergens": []
+    },
+    {
+      "id": 28,
+      "name": "Cheesecake",
+      "description": "Creamy cheesecake with a smooth biscuit base",
+      "price": 229,
+      "category": "Desserts",
+      "type": "Veg",
+      "rating": 4.7,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1565958011703-44f9829ba187",
+      "calories": "approx 270 kcal",
+      "allergens": []
+    },
+    {
+      "id": 29,
+      "name": "Belgian Waffle",
+      "description": "Crispy waffle topped with chocolate and sweet toppings",
+      "price": 249,
+      "category": "Desserts",
+      "type": "Veg",
+      "rating": 4.6,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307",
+      "calories": "approx 562 kcal",
+      "allergens": []
+    },
+    {
+      "id": 30,
+      "name": "Vanilla Ice Cream",
+      "description": "Classic vanilla ice cream with creamy texture",
+      "price": 99,
+      "category": "Desserts",
+      "type": "Veg",
+      "rating": 4.4,
+      "availability": true,
+      "image": "https://images.unsplash.com/photo-1563805042-7684c019e1cb",
+      "calories": "approx 774 kcal",
+      "allergens": [
+        "Gluten"
+      ]
+    }
+  ]
+}
