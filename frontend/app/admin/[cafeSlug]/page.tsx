@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import QRCode from "react-qr-code";
 import { getCafeBySlug, getMenuByCafeId } from "../../../src/data/saasDb";
 
 export default function CafeAdminDashboard() {
@@ -80,13 +81,14 @@ export default function CafeAdminDashboard() {
             <div style={{ background: "white", borderRadius: "12px", padding: "40px", border: "1px solid #e5e7eb", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "400px", margin: "0 auto" }}>
               <div style={{ fontSize: "24px", fontWeight: "bold", color: "#111827", marginBottom: "24px" }}>{cafe.name} Menu</div>
               
-              {/* Mock single QR Code */}
-              <div style={{ width: "200px", height: "200px", background: "white", border: "2px solid #000", padding: "12px", display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gridTemplateRows: "repeat(5, 1fr)", gap: "4px", marginBottom: "24px" }}>
-                {Array(25).fill(0).map((_, i) => (
-                  <div key={i} style={{ background: Math.random() > 0.4 ? "#000" : "#fff" }}></div>
-                ))}
-                {/* QR Code Eyes */}
-                <div style={{ position: "absolute", width: "40px", height: "40px", border: "6px solid #000", margin: "12px" }}></div>
+              {/* Real QR Code */}
+              <div style={{ background: "white", padding: "16px", borderRadius: "12px", border: "1px solid #e5e7eb", marginBottom: "24px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>
+                <QRCode 
+                  value={`https://table-top.vercel.app/${slug}`} 
+                  size={200}
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  viewBox={`0 0 256 256`}
+                />
               </div>
 
               <a href={`https://table-top.vercel.app/${slug}`} target="_blank" style={{ color: "#3b82f6", textDecoration: "none", fontSize: "16px", marginBottom: "24px", wordBreak: "break-all", background: "#f0f7ff", padding: "12px", borderRadius: "8px", width: "100%", boxSizing: "border-box" }}>
