@@ -46,12 +46,7 @@ export default function CategoryPage() {
         {items.map((item) => (
           <MenuCard
             key={item.id}
-            id={item.id}
-            name={item.name}
-            price={item.price}
-            description={item.description}
-            image={item.image}
-            type={item.type}
+            item={item}
           />
         ))}
       </div>

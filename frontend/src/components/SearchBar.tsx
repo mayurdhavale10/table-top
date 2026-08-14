@@ -1,4 +1,4 @@
-function SearchBar({ search, setSearch }) {
+function SearchBar({ search = "", setSearch = (s: string) => {} }: { search?: string, setSearch?: (s: string) => void }) {
   return (
     <div style={{ margin: "20px 0" }}>
       <input

@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { useCart } from "../../../src/context/CartContext";
 
 export default function CheckoutPage() {
@@ -66,7 +68,7 @@ export default function CheckoutPage() {
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", color: "#7A7571" }}>
             <span>Taxes (5%)</span>
-            <span>₹{taxes.toFixed(2)}</span>
+            <span>₹{tax.toFixed(2)}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", color: "#7A7571" }}>
             <span>Service Charge (5%)</span>
@@ -85,7 +87,7 @@ export default function CheckoutPage() {
         <textarea placeholder="Any special cooking instructions?" style={{ width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid #D5D1CB", fontSize: "16px", minHeight: "100px", fontFamily: "inherit", boxSizing: "border-box" }}></textarea>
       </div>
 
-      <button onClick={handlePlaceOrder} style={{
+      <button onClick={handlePayment} style={{
         width: "100%",
         background: "#1A1817",
         color: "white",
