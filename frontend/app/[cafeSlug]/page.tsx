@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SearchBar from "../../src/components/SearchBar";
 import RestaurantHeader from "../../src/components/RestaurantHeader";
-import CategoryBar from "../../src/components/CategoryBar";
+import CategoryGrid from "../../src/components/CategoryGrid";
 import GamesBanner from "../../src/components/GamesBanner";
 import Link from "next/link";
 import { MessageSquareHeart } from "lucide-react";
@@ -30,9 +29,8 @@ function CafeHomePage() {
 
       {/* Passing dynamic cafe data down */}
       <RestaurantHeader name={cafe.name} location={cafe.location} />
-      <SearchBar />
       
-      <CategoryBar cafeSlug={slug} />
+      <CategoryGrid cafeSlug={slug} />
       <GamesBanner cafeSlug={slug} />
 
       <div style={{ padding: "0 20px 40px 20px" }}>

@@ -1,70 +1,49 @@
 .category-wrapper {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 32px 16px;
-  padding: 16px 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px 16px;
+  padding: 32px 24px;
   background: transparent;
-  z-index: 100;
-  margin-top: 80px; /* Bring them down much more */
-  margin-bottom: 48px;
-  max-width: 1200px;
+  margin-top: 0;
+  margin-bottom: 24px;
+  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-}
-
-.category-wrapper::-webkit-scrollbar {
-  display: none;
 }
 
 .category-card {
   background: transparent;
   border: none;
   padding: 8px 12px;
-  white-space: nowrap;
   cursor: pointer;
-  transition: 0.3s;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-bottom: 3px solid transparent;
-}
-
-.category-card:hover {
-  border-bottom: 3px solid #8B2E2E; /* Deep terracotta hover */
+  justify-content: flex-start;
 }
 
 .category-card h3 {
   margin: 0;
-  font-size: 24px; /* 2x larger */
-  font-weight: 700; /* Bolder */
+  font-size: 15px;
+  font-weight: 700;
   font-family: var(--font-inter), sans-serif;
   color: #7A7571;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
-.category-card:hover h3 {
+.category-icon {
+  color: #7A7571;
+}
+
+.category-card:hover h3, .category-card:hover .category-icon {
   color: #1A1817;
 }
 
-/* Mobile responsiveness */
 @media (max-width: 800px) {
   .category-wrapper {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px 8px;
-    padding: 16px 12px;
-    margin-top: 40px;
-  }
-  .category-card h3 {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 400px) {
-  .category-card h3 {
-    font-size: 14px;
+    gap: 32px 16px;
   }
 }

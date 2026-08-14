@@ -5,29 +5,17 @@ import "../styles/GamesBanner.css";
 
 export default function GamesBanner({ cafeSlug = "sips-and-bites" }: { cafeSlug?: string }) {
   return (
-    <div className="games-banner-container">
-      <div className="games-header">
-        <h2>Arcade</h2>
-        <Link href={`/${cafeSlug}/games`} className="see-all-link">See all &rarr;</Link>
-      </div>
-      
-      <div className="games-scroll">
-        <Link href={`/${cafeSlug}/games/baddie-detector`} className="game-card baddie-detector">
-          <div className="game-icon">💅</div>
-          <div className="game-info">
-            <h3>Baddie Detector</h3>
-            <p>Scan your face to find out</p>
+    <Link href={`/${cafeSlug}/games`} style={{ textDecoration: "none" }}>
+      <div className="games-banner">
+        <div className="games-icon">
+          <div style={{ background: "#2C2A29", width: 40, height: 40, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "16px", fontWeight: "bold" }}>
+            N
           </div>
-        </Link>
-        
-        <Link href={`/${cafeSlug}/games/tic-tac-toe`} className="game-card tic-tac-toe">
-          <div className="game-icon">❌</div>
-          <div className="game-info">
-            <h3>Tic Tac Toe</h3>
-            <p>Challenge a friend</p>
-          </div>
-        </Link>
+        </div>
+        <div className="games-text">
+          <h3>Play games until you<br/>wait for your order</h3>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
