@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import SearchBar from "../../src/components/SearchBar";
 import RestaurantHeader from "../../src/components/RestaurantHeader";
 import CategoryBar from "../../src/components/CategoryBar";
-import CategoryGrid from "../../src/components/CategoryGrid";
 import GamesBanner from "../../src/components/GamesBanner";
 import Link from "next/link";
 import { MessageSquareHeart } from "lucide-react";
@@ -27,34 +26,13 @@ function CafeHomePage() {
 
   return (
     <div className="home-container" style={{ position: "relative" }}>
-      {/* Floating Back Button for Testing Purposes */}
-      <Link href="/" style={{
-        position: "absolute",
-        top: "16px",
-        left: "16px",
-        background: "rgba(255,255,255,0.9)",
-        backdropFilter: "blur(4px)",
-        color: "#1A1817",
-        padding: "8px 16px",
-        borderRadius: "20px",
-        textDecoration: "none",
-        fontWeight: "bold",
-        fontSize: "14px",
-        zIndex: 100,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-        display: "flex",
-        alignItems: "center",
-        gap: "4px"
-      }}>
-        ← Back to Platform
-      </Link>
+
 
       {/* Passing dynamic cafe data down */}
       <RestaurantHeader name={cafe.name} location={cafe.location} />
       <SearchBar />
       
       <CategoryBar cafeSlug={slug} />
-      <CategoryGrid cafeSlug={slug} />
       <GamesBanner cafeSlug={slug} />
 
       <div style={{ padding: "0 20px 40px 20px" }}>
