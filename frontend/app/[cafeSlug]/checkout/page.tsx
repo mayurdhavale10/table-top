@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCart } from "../../src/context/CartContext";
+import { useCart } from "../../../src/context/CartContext";
 
 export default function CheckoutPage() {
   const { cart, removeFromCart, totalPrice, clearCart } = useCart();

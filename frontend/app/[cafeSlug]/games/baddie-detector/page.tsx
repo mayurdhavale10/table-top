@@ -2,6 +2,8 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { useParams } from "next/navigation";
 
 export default function BaddieDetector() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -49,17 +51,21 @@ export default function BaddieDetector() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FAF8F5" }}>
-      <div style={{ background: "white", padding: "20px", display: "flex", alignItems: "center", gap: "16px", borderBottom: "1px solid #EAE6DF", position: "sticky", top: 0, zIndex: 10 }}>
+    <div style={{ minHeight: "100vh", background: "#FAF8F5", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ width: "100%", background: "white", padding: "20px", display: "flex", alignItems: "center", gap: "16px", borderBottom: "1px solid #EAE6DF", position: "sticky", top: 0, zIndex: 10 }}>
         <Link href={`/${cafeSlug}/games`} style={{ color: "#1A1817" }}>
           <ArrowLeft size={24} />
         </Link>
-      {error ? (
-        <div style={{ background: "#FDF3F3", color: "#C62828", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
-          {error}
-        </div>
-      ) : (
-        <div style={{ position: "relative", width: "100%", maxWidth: "300px", aspectRatio: "3/4", borderRadius: "24px", overflow: "hidden", background: "#000", boxShadow: "0 12px 32px rgba(0,0,0,0.2)" }}>
+        <div style={{ fontWeight: "bold", fontSize: "18px" }}>Baddie Detector</div>
+      </div>
+      
+      <div style={{ padding: "40px 20px", display: "flex", flexDirection: "column", alignItems: "center", width: "100%", flex: 1 }}>
+        {error ? (
+          <div style={{ background: "#FDF3F3", color: "#C62828", padding: "16px", borderRadius: "12px", textAlign: "center", width: "100%", maxWidth: "300px" }}>
+            {error}
+          </div>
+        ) : (
+          <div style={{ position: "relative", width: "100%", maxWidth: "300px", aspectRatio: "3/4", borderRadius: "24px", overflow: "hidden", background: "#000", boxShadow: "0 12px 32px rgba(0,0,0,0.2)" }}>
           <video 
             ref={videoRef} 
             autoPlay 
@@ -69,7 +75,7 @@ export default function BaddieDetector() {
           />
           
           {/* Scanning Animation Overlay */}
-          {scanning && (
+          {isScanning && (
             <div style={{
               position: "absolute",
               top: 0,
@@ -129,24 +135,25 @@ export default function BaddieDetector() {
       {!error && (
         <button 
           onClick={handleScan}
-          disabled={!streamActive || scanning}
+          disabled={isScanning}
           style={{
             marginTop: "40px",
-            background: scanning ? "#999" : "#1A1817",
+            background: isScanning ? "#999" : "#1A1817",
             color: "white",
             border: "none",
             padding: "16px 40px",
             borderRadius: "30px",
             fontSize: "18px",
             fontWeight: "bold",
-            cursor: scanning ? "not-allowed" : "pointer",
+            cursor: isScanning ? "not-allowed" : "pointer",
             boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
             transition: "0.2s"
           }}
         >
-          {scanning ? "SCANNING..." : "SCAN FACE"}
+          {isScanning ? "SCANNING..." : "SCAN FACE"}
         </button>
       )}
+      </div>
     </div>
   );
 }
