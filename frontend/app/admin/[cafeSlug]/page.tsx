@@ -84,15 +84,15 @@ export default function CafeAdminDashboard() {
               {/* Real QR Code */}
               <div style={{ background: "white", padding: "16px", borderRadius: "12px", border: "1px solid #e5e7eb", marginBottom: "24px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>
                 <QRCode 
-                  value={`https://table-top.vercel.app/${slug}`} 
+                  value={`https://table-top-inky.vercel.app/${slug}`} 
                   size={200}
                   style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                   viewBox={`0 0 256 256`}
                 />
               </div>
 
-              <a href={`https://table-top.vercel.app/${slug}`} target="_blank" style={{ color: "#3b82f6", textDecoration: "none", fontSize: "16px", marginBottom: "24px", wordBreak: "break-all", background: "#f0f7ff", padding: "12px", borderRadius: "8px", width: "100%", boxSizing: "border-box" }}>
-                table-top.vercel.app/{slug}
+              <a href={`https://table-top-inky.vercel.app/${slug}`} target="_blank" style={{ color: "#3b82f6", textDecoration: "none", fontSize: "16px", marginBottom: "24px", wordBreak: "break-all", background: "#f0f7ff", padding: "12px", borderRadius: "8px", width: "100%", boxSizing: "border-box" }}>
+                table-top-inky.vercel.app/{slug}
               </a>
 
               <button style={{ background: cafe.theme.primaryColor, border: "none", padding: "16px 24px", borderRadius: "8px", fontWeight: "bold", color: "white", cursor: "pointer", width: "100%", fontSize: "16px" }}>
