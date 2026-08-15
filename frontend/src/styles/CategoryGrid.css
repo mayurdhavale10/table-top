@@ -16,11 +16,17 @@
 .category-card {
   background: transparent;
   border: none;
+  border-bottom: 3px solid transparent; /* Added back for hover effect */
   padding: 8px 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  border-bottom: 3px solid #8B2E2E; /* Brown terracotta line on hover */
 }
 
 .category-card h3 {
