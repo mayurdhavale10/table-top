@@ -1,48 +1,45 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import RestaurantHeader from "../../src/components/RestaurantHeader";
 import CategoryGrid from "../../src/components/CategoryGrid";
 import GamesBanner from "../../src/components/GamesBanner";
-import BannerAd from "../../src/components/BannerAd";
 import Link from "next/link";
 import { MessageSquareHeart } from "lucide-react";
 import "../../src/styles/Home.css";
-import { getCafeBySlug } from "../../src/data/saasDb";
-import { useParams } from "next/navigation";
+import { getCafeBySlug, getMenuByCafeId } from "../../src/lib/data";
+import { notFound } from "next/navigation";
 
-function CafeHomePage() {
-  const params = useParams();
-  const slug = Array.isArray(params?.cafeSlug) ? params.cafeSlug[0] : params?.cafeSlug || "sips-and-bites";
-  const [cafe, setCafe] = useState<any>(null);
+export default async function CafeHomePage({
+  params,
+}: {
+  params: Promise<{ cafeSlug: string }>;
+}) {
+  const { cafeSlug } = await params;
 
-  useEffect(() => {
-    // Mock fetching cafe data from DB
-    const cafeData = getCafeBySlug(slug as string);
-    setCafe(cafeData);
-  }, [slug]);
+  const cafe = await getCafeBySlug(cafeSlug);
+  if (!cafe) notFound();
 
-  if (!cafe) return <div style={{ padding: "40px", textAlign: "center" }}>Loading Cafe...</div>;
+  const menu = await getMenuByCafeId(cafe._id);
+  const uniqueCats = Array.from(new Set(menu.map((m) => m.category)));
+  const categories = uniqueCats.map((c, i) => ({
+    id: String(i),
+    name: c.charAt(0).toUpperCase() + c.slice(1),
+  }));
 
   return (
     <div className="home-container" style={{ position: "relative" }}>
-
-
-      {/* Passing dynamic cafe data down */}
       <RestaurantHeader name={cafe.name} location={cafe.location} />
-      
-      <CategoryGrid cafeSlug={slug} />
-      <GamesBanner cafeSlug={slug} />
+
+      <CategoryGrid cafeSlug={cafeSlug} categories={categories} />
+      <GamesBanner cafeSlug={cafeSlug} />
 
       <div style={{ padding: "0 20px 40px 20px" }}>
-        <Link href={`/${slug}/feedback`} style={{ textDecoration: "none" }}>
-          <div style={{ 
-            background: "#FDFBF9", 
-            border: "1px solid #EAE6DF", 
-            padding: "16px", 
-            borderRadius: "16px", 
-            display: "flex", 
-            alignItems: "center", 
+        <Link href={`/${cafeSlug}/feedback`} style={{ textDecoration: "none", display: "block" }}>
+          <div style={{
+            background: "#FDFBF9",
+            border: "1px solid #EAE6DF",
+            padding: "16px",
+            borderRadius: "16px",
+            display: "flex",
+            alignItems: "center",
             justifyContent: "space-between",
             boxShadow: "0 4px 12px rgba(0,0,0,0.03)"
           }}>
@@ -59,12 +56,6 @@ function CafeHomePage() {
           </div>
         </Link>
       </div>
-
-      <div style={{ padding: "0 20px 40px 20px" }}>
-        <BannerAd />
-      </div>
     </div>
   );
 }
-
-export default CafeHomePage;

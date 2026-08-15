@@ -1,10 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Leaf, Drumstick, Utensils, Pizza, Sandwich, UtensilsCrossed, CupSoda, IceCream } from "lucide-react";
 import "../styles/CategoryGrid.css";
-import { getMenuByCafeId, getCafeBySlug } from "../data/saasDb";
 
 const getCategoryIcon = (name: string) => {
   const n = name.toLowerCase();
@@ -19,23 +17,16 @@ const getCategoryIcon = (name: string) => {
   return <Utensils size={24} className="category-icon" />;
 };
 
-export default function CategoryGrid({ cafeSlug = "sips-and-bites" }: { cafeSlug?: string }) {
-  const router = useRouter();
-  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
+type Category = { id: string; name: string };
 
-  useEffect(() => {
-    // Derive categories from the cafe's menu items
-    const cafe = getCafeBySlug(cafeSlug);
-    if (cafe) {
-      const menu = getMenuByCafeId(cafe.id);
-      const uniqueCats = Array.from(new Set(menu.map(m => m.category)));
-      const catObjects = uniqueCats.map((c, i) => ({
-        id: String(i),
-        name: c.charAt(0).toUpperCase() + c.slice(1)
-      }));
-      setCategories(catObjects);
-    }
-  }, [cafeSlug]);
+export default function CategoryGrid({
+  cafeSlug = "sips-and-bites",
+  categories = [],
+}: {
+  cafeSlug?: string;
+  categories?: Category[];
+}) {
+  const router = useRouter();
 
   return (
     <div className="category-wrapper">

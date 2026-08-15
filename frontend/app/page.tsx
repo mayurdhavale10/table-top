@@ -1,44 +1,96 @@
-"use client";
-
 import Link from "next/link";
+import { UtensilsCrossed, ShieldCheck, ChefHat, Smartphone, ArrowRight, ArrowUpRight } from "lucide-react";
+import "../src/styles/Landing.css";
+
+const personas = [
+  {
+    href: "/super-admin",
+    icon: ShieldCheck,
+    title: "Super Admin",
+    description: "Onboard restaurants, manage cafes, and generate ordering QR codes across the platform.",
+  },
+  {
+    href: "/admin/sips-and-bites",
+    icon: ChefHat,
+    title: "Cafe Admin",
+    description: "Manage a single restaurant's live menu, pricing, and categories.",
+  },
+  {
+    href: "/sips-and-bites",
+    icon: Smartphone,
+    title: "Customer View",
+    description: "The ordering experience a guest sees after scanning their table's QR code.",
+  },
+];
 
 export default function SaaSLandingPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#FAF8F5", color: "#1A1817", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-      <div style={{ textAlign: "center", maxWidth: "800px" }}>
-        <h1 style={{ fontFamily: "var(--font-playfair), serif", fontSize: "48px", marginBottom: "16px" }}>
-          Table-Top SaaS Platform
-        </h1>
-        <p style={{ fontSize: "18px", color: "#7A7571", marginBottom: "40px" }}>
-          The ultimate digital menu and ordering system for restaurants. 
-        </p>
+    <div className="landing">
+      <nav className="landing-nav">
+        <Link href="/" className="landing-logo">
+          <span className="landing-logo-mark">
+            <UtensilsCrossed size={16} strokeWidth={1.75} />
+          </span>
+          <span className="landing-logo-text">Table Top</span>
+        </Link>
 
-        <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/super-admin" style={{ textDecoration: "none" }}>
-            <div style={{ background: "#1A1817", color: "white", padding: "24px", borderRadius: "16px", width: "250px", boxShadow: "0 8px 24px rgba(0,0,0,0.1)", transition: "0.2s" }}>
-              <div style={{ fontSize: "32px", marginBottom: "16px" }}>👑</div>
-              <h3 style={{ margin: "0 0 8px 0" }}>Super Admin</h3>
-              <p style={{ margin: "0", fontSize: "14px", opacity: 0.8 }}>Manage all cafes on the platform.</p>
-            </div>
+        <div className="landing-nav-actions">
+          <Link href="/sips-and-bites" className="landing-nav-link">
+            Live Demo
           </Link>
-
-          <Link href="/admin/sips-and-bites" style={{ textDecoration: "none" }}>
-            <div style={{ background: "#FDFBF9", color: "#1A1817", border: "1px solid #D5D1CB", padding: "24px", borderRadius: "16px", width: "250px", boxShadow: "0 8px 24px rgba(0,0,0,0.05)", transition: "0.2s" }}>
-              <div style={{ fontSize: "32px", marginBottom: "16px" }}>🧑‍🍳</div>
-              <h3 style={{ margin: "0 0 8px 0" }}>Cafe Admin</h3>
-              <p style={{ margin: "0", fontSize: "14px", color: "#7A7571" }}>Manage Sips & Bites menu.</p>
-            </div>
-          </Link>
-
-          <Link href="/sips-and-bites" style={{ textDecoration: "none" }}>
-            <div style={{ background: "#FDF3F3", color: "#C62828", border: "1px solid rgba(220, 38, 38, 0.15)", padding: "24px", borderRadius: "16px", width: "250px", boxShadow: "0 8px 24px rgba(220, 38, 38, 0.05)", transition: "0.2s" }}>
-              <div style={{ fontSize: "32px", marginBottom: "16px" }}>📱</div>
-              <h3 style={{ margin: "0 0 8px 0" }}>Customer View</h3>
-              <p style={{ margin: "0", fontSize: "14px", opacity: 0.8 }}>View the Sips & Bites menu.</p>
-            </div>
+          <Link href="/super-admin" className="landing-nav-cta">
+            Super Admin
+            <ArrowRight size={14} strokeWidth={2} />
           </Link>
         </div>
-      </div>
+      </nav>
+
+      <section className="landing-hero">
+        <span className="landing-badge">
+          <span className="landing-badge-dot" />
+          Multi-tenant ordering platform
+        </span>
+
+        <h1>
+          The digital menu for <span>modern restaurants</span>.
+        </h1>
+
+        <p>
+          One QR code per table. A live menu that updates in real time. Table Top
+          replaces printed menus with an ordering system built for restaurants
+          that care about the details.
+        </p>
+
+        <div className="landing-hero-actions">
+          <Link href="/sips-and-bites" className="landing-btn-primary">
+            View Live Demo
+            <ArrowRight size={15} strokeWidth={2} />
+          </Link>
+          <Link href="/super-admin" className="landing-btn-secondary">
+            Super Admin
+          </Link>
+        </div>
+      </section>
+
+      <section className="landing-personas">
+        {personas.map(({ href, icon: Icon, title, description }) => (
+          <Link href={href} key={href} className="landing-card">
+            <span className="landing-card-icon">
+              <Icon size={20} strokeWidth={1.75} />
+            </span>
+            <h3>{title}</h3>
+            <p>{description}</p>
+            <span className="landing-card-arrow">
+              <ArrowUpRight size={16} strokeWidth={2} />
+            </span>
+          </Link>
+        ))}
+      </section>
+
+      <footer className="landing-footer">
+        <span>© 2026 Table Top</span>
+        <span>Built for restaurants that care about the details.</span>
+      </footer>
     </div>
   );
 }
