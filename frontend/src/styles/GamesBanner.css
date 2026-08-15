@@ -27,3 +27,24 @@
   color: #2C2A29;
   line-height: 1.3;
 }
+
+@media (min-width: 801px) {
+  .games-banner {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    z-index: 100;
+  }
+  
+  .games-banner:hover {
+    background: transparent;
+    transform: scale(1.1);
+  }
+  
+  .games-text {
+    display: none;
+  }
+}
