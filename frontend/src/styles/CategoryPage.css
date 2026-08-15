@@ -1,27 +1,94 @@
-.category-page{
-    width:95%;
-    margin:auto;
-    padding:30px 0;
+.category-page {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+  min-height: 100vh;
+  position: relative;
 }
 
-.back-button{
-    text-decoration:none;
-    color:#0f9d58;
-    font-size:20px;
-    font-weight:bold;
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 20px 16px 20px;
+  background: #FAF8F5;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.category-page h1{
-    margin:20px 0 30px;
-    font-size:38px;
+.back-button {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.menu-grid{
-    display:grid;
-    grid-template-columns: 1fr; /* Single column list view as sketched */
-    gap: 0; /* Remove gap so borders touch */
+.category-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-family: var(--font-playfair), serif;
+  color: #1A1817;
 }
 
-.ad-section{
-    grid-column:1/-1;
+.items-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px 120px 20px; /* Lots of bottom padding for sticky cart */
+}
+
+/* Sticky Cart Button */
+.sticky-cart-wrapper {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 400px;
+  z-index: 1000;
+}
+
+.sticky-cart-button {
+  background: #1A1817;
+  color: white;
+  border-radius: 100px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+
+.sticky-cart-button:active {
+  transform: scale(0.98);
+}
+
+.cart-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cart-count {
+  background: rgba(255,255,255,0.2);
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cart-total {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.cart-action {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
