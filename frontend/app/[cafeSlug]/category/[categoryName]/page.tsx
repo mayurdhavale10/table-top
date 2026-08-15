@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import MenuCard from "../../../../src/components/MenuCard";
+import NativeAdCard from "../../../../src/components/NativeAdCard";
+import InlineAdBanner from "../../../../src/components/InlineAdBanner";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import "../../../../src/styles/CategoryPage.css";
@@ -43,12 +45,23 @@ export default function CategoryPage() {
       </div>
 
       <div className="items-list">
-        {items.map((item) => (
-          <MenuCard
-            key={item.id}
-            item={item}
-          />
+        {items.map((item, index) => (
+          <React.Fragment key={item.id}>
+            <MenuCard item={item} />
+            {/* Inject Native Ad after the 2nd item */}
+            {index === 1 && (
+              <NativeAdCard 
+                sponsorName="Kalyan Jewelers" 
+                description="Special festive offers on Gold and Diamond jewelry. Visit our store near Khadakpada!" 
+                tag="Local Sponsor" 
+                ctaText="View Offers" 
+              />
+            )}
+          </React.Fragment>
         ))}
+        
+        {/* Inject Inline Ad Banner at the bottom of the list */}
+        {items.length > 0 && <InlineAdBanner />}
       </div>
       
       {/* Sticky Cart Button */}

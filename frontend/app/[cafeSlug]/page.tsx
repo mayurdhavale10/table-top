@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import RestaurantHeader from "../../src/components/RestaurantHeader";
 import CategoryGrid from "../../src/components/CategoryGrid";
 import GamesBanner from "../../src/components/GamesBanner";
+import BannerAd from "../../src/components/BannerAd";
 import Link from "next/link";
 import { MessageSquareHeart } from "lucide-react";
 import "../../src/styles/Home.css";
@@ -57,6 +58,10 @@ function CafeHomePage() {
             <div style={{ color: "#0f9d58", fontWeight: "bold" }}>→</div>
           </div>
         </Link>
+      </div>
+
+      <div style={{ padding: "0 20px 40px 20px" }}>
+        <BannerAd />
       </div>
     </div>
   );
