@@ -129,10 +129,26 @@
 .landing-hero {
   position: relative;
   z-index: 1;
+  width: 100%;
+  padding: 140px 24px 120px;
+  text-align: center;
+  background-image: linear-gradient(rgba(26, 24, 23, 0.75), rgba(26, 24, 23, 0.75)), url('/dekstop.webp');
+  background-size: cover;
+  background-position: center;
+  color: #FDFBF9;
+  border-bottom: 1px solid var(--lp-border);
+}
+
+@media (max-width: 768px) {
+  .landing-hero {
+    padding: 100px 24px 80px;
+    background-image: linear-gradient(rgba(26, 24, 23, 0.75), rgba(26, 24, 23, 0.75)), url('/phone.webp');
+  }
+}
+
+.landing-hero-content {
   max-width: 720px;
   margin: 0 auto;
-  padding: 96px 24px 64px;
-  text-align: center;
 }
 
 .landing-badge {
@@ -142,11 +158,12 @@
   padding: 6px 14px;
   font-size: 12px;
   letter-spacing: 0.02em;
-  color: var(--lp-text-muted);
-  background: var(--lp-glass);
-  border: 1px solid var(--lp-border);
+  color: rgba(253, 251, 249, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
   margin-bottom: 24px;
+  backdrop-filter: blur(8px);
 }
 
 .landing-badge-dot {
@@ -163,6 +180,7 @@
   line-height: 1.12;
   letter-spacing: -0.01em;
   margin: 0 0 20px;
+  color: #FDFBF9;
 }
 
 .landing-hero h1 span {
@@ -172,7 +190,7 @@
 .landing-hero p {
   font-size: 16px;
   line-height: 1.65;
-  color: var(--lp-text-muted);
+  color: rgba(253, 251, 249, 0.9);
   max-width: 480px;
   margin: 0 auto 36px;
 }
@@ -217,6 +235,16 @@
 .landing-btn-secondary:hover {
   background: var(--lp-glass-strong);
   transform: translateY(-1px);
+}
+
+.landing-hero .landing-btn-secondary {
+  color: #FDFBF9;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.landing-hero .landing-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Personas */

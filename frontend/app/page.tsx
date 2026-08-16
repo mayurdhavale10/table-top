@@ -61,27 +61,29 @@ export default function SaaSLandingPage() {
       </nav>
 
       <section className="landing-hero">
-        <span className="landing-badge">
-          <span className="landing-badge-dot" />
-          The Boutique Restaurant Tech
-        </span>
+        <div className="landing-hero-content">
+          <span className="landing-badge">
+            <span className="landing-badge-dot" />
+            The Boutique Restaurant Tech
+          </span>
 
-        <h1>
-          Stop handing your customers a <span>2010 PDF</span>.
-        </h1>
+          <h1>
+            Stop handing your customers a <span>2010 PDF</span>.
+          </h1>
 
-        <p>
-          Table Top is the premium, zero-install digital menu that looks as good as your food tastes. No expensive ERPs. No clunky hardware. Just one QR code.
-        </p>
+          <p>
+            Table Top is the premium, zero-install digital menu that looks as good as your food tastes. No expensive ERPs. No clunky hardware. Just one QR code.
+          </p>
 
-        <div className="landing-hero-actions">
-          <Link href="/sips-and-bites" className="landing-btn-primary">
-            View Live Menu
-            <ArrowRight size={15} strokeWidth={2} />
-          </Link>
-          <Link href="/admin/sips-and-bites" className="landing-btn-secondary">
-            Try Cafe Dashboard
-          </Link>
+          <div className="landing-hero-actions">
+            <Link href="/sips-and-bites" className="landing-btn-primary">
+              View Live Menu
+              <ArrowRight size={15} strokeWidth={2} />
+            </Link>
+            <Link href="/admin/sips-and-bites" className="landing-btn-secondary">
+              Try Cafe Dashboard
+            </Link>
+          </div>
         </div>
       </section>
 
