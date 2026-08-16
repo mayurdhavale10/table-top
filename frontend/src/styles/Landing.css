@@ -133,7 +133,7 @@
   min-height: 100vh;
   padding: 140px 24px 120px;
   text-align: center;
-  background-image: linear-gradient(rgba(26, 24, 23, 0.75), rgba(26, 24, 23, 0.75)), url('/dekstop.webp');
+  background-image: linear-gradient(rgba(26, 24, 23, 0.45), rgba(26, 24, 23, 0.45)), url('/dekstop.webp');
   background-size: cover;
   background-position: center;
   color: #FDFBF9;
@@ -143,7 +143,7 @@
 @media (max-width: 768px) {
   .landing-hero {
     padding: 100px 24px 80px;
-    background-image: linear-gradient(rgba(26, 24, 23, 0.75), rgba(26, 24, 23, 0.75)), url('/phone.webp');
+    background-image: linear-gradient(rgba(26, 24, 23, 0.45), rgba(26, 24, 23, 0.45)), url('/phone.webp');
   }
 }
 
