@@ -10,11 +10,11 @@
   --lp-accent-soft: rgba(139, 46, 46, 0.1);
 
   position: relative;
-  min-height: 100vh;
+  height: 100vh; /* Locked to viewport height */
   background: var(--lp-bg);
   color: var(--lp-text);
   font-family: var(--font-inter), sans-serif;
-  overflow: hidden;
+  overflow: hidden; /* Prevent scrolling entirely */
 }
 
 .landing::before,
@@ -45,8 +45,8 @@
 
 /* Navbar */
 
-.landing-nav {
-  position: absolute;
+.landing-nav-new {
+  position: absolute; /* The user asked for sticky ONLY if scrolled, but since there's no content to scroll to, absolute top is perfect */
   top: 0;
   left: 0;
   right: 0;
@@ -54,75 +54,92 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 32px;
+  padding: 32px 8%;
   background: transparent;
-  border-bottom: none;
 }
 
-.landing-logo {
+.landing-logo-new {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   text-decoration: none;
   color: #FDFBF9;
 }
 
-.landing-logo-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: var(--lp-accent-soft);
-  border: 1px solid rgba(201, 161, 90, 0.3);
+.logo-icon-simple {
   color: var(--lp-accent);
 }
 
-.landing-logo-text {
-  font-size: 16px;
-  font-weight: 600;
+.landing-logo-text-new {
+  font-family: var(--font-playfair), serif;
+  font-size: 26px;
+  font-weight: 500;
   letter-spacing: -0.01em;
+}
+
+.landing-contact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #FDFBF9;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 10px 18px;
+  /* Grey film removed */
 }
 
 .landing-nav-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 20px;
 }
 
-.landing-nav-link {
-  padding: 8px 16px;
-  font-size: 14px;
-  color: rgba(253, 251, 249, 0.8);
-  text-decoration: none;
-  border-radius: 8px;
-  transition: color 0.15s ease, background 0.15s ease;
-}
-
-.landing-nav-link:hover {
-  color: #FDFBF9;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.landing-nav-cta {
+.landing-btn-nav {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 10px 20px;
+  font-size: 15px;
   font-weight: 600;
-  color: #FDFBF9;
-  background: var(--lp-accent);
-  border-radius: 8px;
+  color: var(--lp-text);
+  background: #FDFBF9;
+  border-radius: 999px; /* Pill shape */
   text-decoration: none;
-  transition: filter 0.15s ease, transform 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.landing-nav-cta:hover {
-  filter: brightness(1.08);
+.landing-btn-nav:hover {
+  opacity: 0.9;
   transform: translateY(-1px);
 }
+
+@media (max-width: 768px) {
+  .landing-nav-new {
+    padding: 24px 6%;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .landing-logo-text-new {
+    font-size: 22px;
+  }
+
+  .landing-contact {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .landing-btn-nav {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .landing-nav-actions {
+    gap: 12px;
+  }
+}
+
+/* Removed old unused navbar styles */
 
 /* Hero */
 
@@ -130,12 +147,12 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   align-items: center;
   padding: 80px 8%;
   text-align: left;
-  background-image: linear-gradient(rgba(26, 24, 23, 0.45), rgba(26, 24, 23, 0.45)), url('/dekstop.webp');
+  background-image: linear-gradient(90deg, rgba(20, 18, 16, 0.8) 0%, rgba(20, 18, 16, 0.3) 45%, rgba(20, 18, 16, 0.1) 100%), url('/dekstop.webp');
   background-size: cover;
   background-position: center;
   color: #FDFBF9;
@@ -145,7 +162,7 @@
 @media (max-width: 768px) {
   .landing-hero {
     padding: 100px 6%;
-    background-image: linear-gradient(rgba(26, 24, 23, 0.45), rgba(26, 24, 23, 0.45)), url('/phone.webp');
+    background-image: linear-gradient(rgba(20, 18, 16, 0.7), rgba(20, 18, 16, 0.3)), url('/phone.webp');
   }
 }
 
@@ -163,10 +180,10 @@
 
 .landing-hero-logo {
   position: absolute;
-  top: 0;
+  top: 60px; /* Moved down */
   left: 0;
   font-family: var(--font-playfair), serif;
-  font-size: 28px;
+  font-size: 42px; /* Made bigger as requested */
   color: #FDFBF9;
   letter-spacing: -0.02em;
 }
@@ -181,12 +198,7 @@
 
 .landing-hero-text {
   max-width: 560px;
-  background: rgba(20, 18, 16, 0.5); /* Grey film behind text */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 40px;
-  border-radius: 12px;
-  margin-left: -40px; /* Shift a bit further left relative to the logo */
+  /* Grey film removed */
 }
 
 .landing-hero-text h1 {
@@ -196,6 +208,7 @@
   line-height: 1.15;
   color: #FDFBF9;
   margin: 0 0 32px;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.4); /* Subtle shadow for readability instead of a visible film */
 }
 
 .landing-hero-text p {
@@ -205,37 +218,19 @@
   margin: 0 0 40px;
 }
 
-.landing-hero-scroll {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  color: rgba(253, 251, 249, 0.7);
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-10px); }
-  60% { transform: translateY(-5px); }
-}
-
 /* Buttons */
-.landing-btn-primary,
-.landing-btn-secondary {
+.landing-btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 22px;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: filter 0.15s ease, transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-}
-
-.landing-btn-primary {
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 500;
   color: #FDFBF9;
   background: var(--lp-accent);
+  border-radius: 4px;
+  text-decoration: none;
+  transition: filter 0.15s ease, transform 0.15s ease, background 0.15s ease;
 }
 
 .landing-btn-primary:hover {
@@ -243,26 +238,7 @@
   transform: translateY(-1px);
 }
 
-.landing-btn-secondary {
-  color: var(--lp-text);
-  background: var(--lp-glass);
-  border: 1px solid var(--lp-border-strong);
-}
-
-.landing-btn-secondary:hover {
-  background: var(--lp-glass-strong);
-  transform: translateY(-1px);
-}
-
-.landing-hero .landing-btn-secondary {
-  color: #FDFBF9;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.landing-hero .landing-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
+/* Removed unused footer and scroll classes */
 
 /* Personas */
 
