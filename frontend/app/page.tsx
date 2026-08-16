@@ -41,24 +41,7 @@ const features = [
 export default function SaaSLandingPage() {
   return (
     <div className="landing">
-      <nav className="landing-nav">
-        <Link href="/" className="landing-logo">
-          <span className="landing-logo-mark">
-            <UtensilsCrossed size={16} strokeWidth={1.75} />
-          </span>
-          <span className="landing-logo-text">Table Top</span>
-        </Link>
-
-        <div className="landing-nav-actions">
-          <Link href="/sips-and-bites" className="landing-nav-link">
-            Live Demo
-          </Link>
-          <Link href="/super-admin" className="landing-nav-cta">
-            Admin Login
-            <ArrowRight size={14} strokeWidth={2} />
-          </Link>
-        </div>
-      </nav>
+      {/* Navbar completely removed as requested */}
 
       <section className="landing-hero">
         <div className="landing-hero-content">
