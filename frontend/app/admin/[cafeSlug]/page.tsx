@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import QRCode from "react-qr-code";
 import { getCafeBySlug, getMenuByCafeId } from "../../../src/data/saasDb";
 
+import "../../../src/styles/Admin.css";
+
 export default function CafeAdminDashboard() {
   const params = useParams();
   const slug = Array.isArray(params?.cafeSlug) ? params.cafeSlug[0] : params?.cafeSlug || "";
@@ -17,48 +19,48 @@ export default function CafeAdminDashboard() {
   const menu = getMenuByCafeId(cafe.id);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb", display: "flex", fontFamily: "sans-serif" }}>
+    <div className="admin-container">
       {/* Sidebar */}
-      <div style={{ width: "250px", background: "white", borderRight: "1px solid #e5e7eb", padding: "24px", display: "flex", flexDirection: "column" }}>
-        <h2 style={{ fontSize: "20px", marginBottom: "40px", color: "#111827", fontWeight: "bold", display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "32px", height: "32px", background: cafe.theme.primaryColor, borderRadius: "8px" }}></div>
+      <div className="admin-sidebar">
+        <h2 className="admin-sidebar-title">
+          <div style={{ width: "32px", height: "32px", background: cafe.theme.primaryColor, borderRadius: "8px", flexShrink: 0 }}></div>
           {cafe.name}
         </h2>
         
-        <button onClick={() => setActiveTab("menu")} style={{ background: activeTab === "menu" ? "#f3f4f6" : "transparent", border: "none", color: "#374151", padding: "12px", textAlign: "left", borderRadius: "8px", cursor: "pointer", marginBottom: "8px", fontSize: "16px", fontWeight: activeTab === "menu" ? "bold" : "normal" }}>
+        <button onClick={() => setActiveTab("menu")} className={`admin-tab ${activeTab === "menu" ? "active" : ""}`}>
           📋 Menu Manager
         </button>
-        <button onClick={() => setActiveTab("orders")} style={{ background: activeTab === "orders" ? "#f3f4f6" : "transparent", border: "none", color: "#374151", padding: "12px", textAlign: "left", borderRadius: "8px", cursor: "pointer", marginBottom: "8px", fontSize: "16px", fontWeight: activeTab === "orders" ? "bold" : "normal" }}>
+        <button onClick={() => setActiveTab("orders")} className={`admin-tab ${activeTab === "orders" ? "active" : ""}`}>
           👨‍🍳 Live Orders
         </button>
-        <button onClick={() => setActiveTab("qr")} style={{ background: activeTab === "qr" ? "#f3f4f6" : "transparent", border: "none", color: "#374151", padding: "12px", textAlign: "left", borderRadius: "8px", cursor: "pointer", fontSize: "16px", fontWeight: activeTab === "qr" ? "bold" : "normal" }}>
+        <button onClick={() => setActiveTab("qr")} className={`admin-tab ${activeTab === "qr" ? "active" : ""}`}>
           📱 QR Codes
         </button>
 
-        <div style={{ marginTop: "auto" }}>
+        <div className="admin-back-link">
           <Link href={`/${slug}`} style={{ color: "#6b7280", textDecoration: "none", fontSize: "14px" }}>
-            &larr; Back to Menu View
+            &larr; Back to Menu
           </Link>
         </div>
       </div>
 
       {/* Main Content */}
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div className="admin-main">
         {activeTab === "menu" && (
           <>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" }}>
-              <h1 style={{ margin: 0, fontSize: "28px", color: "#111827" }}>Menu Manager</h1>
-              <button style={{ background: cafe.theme.primaryColor, color: "white", border: "none", padding: "10px 20px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer" }}>
+            <div className="admin-header">
+              <h1>Menu Manager</h1>
+              <button style={{ background: cafe.theme.primaryColor, color: "white", border: "none", padding: "10px 20px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", flexShrink: 0 }}>
                 + Add Item
               </button>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "24px" }}>
+            <div className="admin-menu-grid">
               {menu.map(item => (
-                <div key={item.id} style={{ background: "white", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb", display: "flex", gap: "16px" }}>
-                  <img src={item.image} alt={item.name} style={{ width: "80px", height: "80px", borderRadius: "8px", objectFit: "cover" }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: "bold", color: "#111827", marginBottom: "4px" }}>{item.name}</div>
+                <div key={item.id} className="admin-menu-item">
+                  <img src={item.image} alt={item.name} style={{ width: "80px", height: "80px", borderRadius: "8px", objectFit: "cover", flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: "bold", color: "#111827", marginBottom: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.name}</div>
                     <div style={{ color: "#6b7280", fontSize: "12px", marginBottom: "8px" }}>{item.category.toUpperCase()}</div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ fontWeight: "bold", color: cafe.theme.primaryColor }}>₹{item.price}</span>
@@ -73,15 +75,14 @@ export default function CafeAdminDashboard() {
 
         {activeTab === "qr" && (
           <>
-            <div style={{ marginBottom: "32px" }}>
-              <h1 style={{ margin: "0 0 8px 0", fontSize: "28px", color: "#111827" }}>Cafe QR Code</h1>
-              <p style={{ color: "#6b7280", margin: 0 }}>Print this QR code and place it anywhere in your cafe. Customers can scan it to view your menu.</p>
+            <div className="admin-header" style={{ flexDirection: "column", alignItems: "flex-start", gap: "8px" }}>
+              <h1>Cafe QR Code</h1>
+              <p style={{ color: "#6b7280", margin: 0 }}>Print this QR code and place it anywhere in your cafe.</p>
             </div>
 
             <div style={{ background: "white", borderRadius: "12px", padding: "40px", border: "1px solid #e5e7eb", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "400px", margin: "0 auto" }}>
               <div style={{ fontSize: "24px", fontWeight: "bold", color: "#111827", marginBottom: "24px" }}>{cafe.name} Menu</div>
               
-              {/* Real QR Code */}
               <div style={{ background: "white", padding: "16px", borderRadius: "12px", border: "1px solid #e5e7eb", marginBottom: "24px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>
                 <QRCode 
                   value={`https://table-top-inky.vercel.app/${slug}`} 
@@ -96,7 +97,7 @@ export default function CafeAdminDashboard() {
               </a>
 
               <button style={{ background: cafe.theme.primaryColor, border: "none", padding: "16px 24px", borderRadius: "8px", fontWeight: "bold", color: "white", cursor: "pointer", width: "100%", fontSize: "16px" }}>
-                Download High-Res PNG
+                Download PNG
               </button>
             </div>
           </>

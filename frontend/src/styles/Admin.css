@@ -1,0 +1,143 @@
+.admin-container {
+  min-height: 100vh;
+  background: #f9fafb;
+  display: flex;
+  font-family: sans-serif;
+}
+
+.admin-sidebar {
+  width: 250px;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.admin-sidebar-title {
+  font-size: 20px;
+  margin-bottom: 40px;
+  color: #111827;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-tab {
+  border: none;
+  color: #374151;
+  padding: 12px;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.admin-tab.active {
+  background: #f3f4f6;
+  font-weight: bold;
+}
+
+.admin-tab:not(.active) {
+  background: transparent;
+}
+
+.admin-back-link {
+  margin-top: auto;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #111827;
+}
+
+.admin-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.admin-menu-item {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  gap: 16px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .admin-container {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 8px;
+    /* Hide scrollbar for clean look */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; 
+  }
+  .admin-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-sidebar-title {
+    margin-bottom: 0;
+    margin-right: 16px;
+  }
+
+  .admin-tab {
+    margin-bottom: 0;
+    padding: 8px 16px;
+    white-space: nowrap;
+  }
+
+  .admin-back-link {
+    display: none;
+  }
+
+  .admin-main {
+    padding: 16px;
+  }
+
+  .admin-header {
+    flex-direction: row;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .admin-header h1 {
+    font-size: 22px;
+  }
+
+  .admin-menu-grid {
+    grid-template-columns: 1fr;
+  }
+}
