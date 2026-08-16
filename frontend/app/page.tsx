@@ -51,8 +51,7 @@ export default function SaaSLandingPage() {
           </div>
           
           <div className="landing-hero-text">
-            <h1>Good food.<br/>Great company.<br/>Simple ordering.</h1>
-            <p>Scan the QR at your table<br/>to explore our menu and<br/>place your order.</p>
+            <h1>Simple ordering.<br/>Good food.<br/>Great company.</h1>
             <Link href="/sips-and-bites" className="landing-btn-primary">
               Learn More
             </Link>
