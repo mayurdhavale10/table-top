@@ -151,12 +151,13 @@
 
 .landing-hero-content {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1600px; /* Wider so it sits further left on big screens */
+  margin: 0 auto 0 0; /* Align left */
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* Stop auto-centering */
+  padding-top: 25vh; /* Push everything lower */
   min-height: calc(100vh - 160px);
 }
 
@@ -179,9 +180,13 @@
 }
 
 .landing-hero-text {
-  margin-top: auto;
-  margin-bottom: auto;
-  max-width: 500px;
+  max-width: 560px;
+  background: rgba(20, 18, 16, 0.5); /* Grey film behind text */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 12px;
+  margin-left: -40px; /* Shift a bit further left relative to the logo */
 }
 
 .landing-hero-text h1 {
@@ -190,7 +195,7 @@
   font-size: clamp(40px, 6vw, 64px);
   line-height: 1.15;
   color: #FDFBF9;
-  margin: 0 0 24px;
+  margin: 0 0 32px;
 }
 
 .landing-hero-text p {
