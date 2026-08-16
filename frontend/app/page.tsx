@@ -10,8 +10,8 @@ const painPoints = [
   },
   {
     icon: Smartphone,
-    title: "For Diners: Decision Fatigue",
-    description: "50% of a massive menu is never ordered. Customers order what's easy to read. Stop hiding your best, high-margin dishes in tiny PDF text.",
+    title: "For Diners: The Fake Price Tag",
+    description: "You never know the real menu or the real prices because third-party delivery apps inflate them by 30% to cover commissions.",
   },
   {
     icon: ShieldCheck,
