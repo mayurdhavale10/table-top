@@ -16,7 +16,7 @@ export default function SaaSLandingPage() {
             <Phone size={16} strokeWidth={1.5} />
             <span>+91 91376 08570</span>
           </a>
-          <Link href="/admin/sips-and-bites" className="landing-btn-nav">
+          <Link href="/login" className="landing-btn-nav">
             Get Started
           </Link>
         </div>
