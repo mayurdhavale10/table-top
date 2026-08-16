@@ -115,27 +115,32 @@
 
 @media (max-width: 768px) {
   .landing-nav-new {
-    padding: 24px 6%;
-    flex-wrap: wrap;
-    gap: 16px;
+    padding: 16px 6%;
+    flex-wrap: nowrap; /* Keep it on one line */
+    gap: 12px;
   }
 
   .landing-logo-text-new {
-    font-size: 22px;
+    font-size: 20px; /* Smaller logo */
+  }
+
+  /* Hide the phone text on mobile to save space, just show the icon */
+  .landing-contact span {
+    display: none;
   }
 
   .landing-contact {
-    font-size: 14px;
-    padding: 8px 12px;
+    padding: 0;
+    margin-right: -4px;
   }
 
   .landing-btn-nav {
-    padding: 8px 16px;
-    font-size: 13px;
+    padding: 8px 14px;
+    font-size: 12px; /* Smaller button */
   }
 
   .landing-nav-actions {
-    gap: 12px;
+    gap: 16px;
   }
 }
 
