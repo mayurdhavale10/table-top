@@ -45,7 +45,22 @@ export default function SaaSLandingPage() {
 
       <section className="landing-hero">
         <div className="landing-hero-content">
-          {/* User requested to remove all text and just keep the transparent navbar over the image */}
+          <div className="landing-hero-logo">
+             Table Top
+             <div className="logo-underline"></div>
+          </div>
+          
+          <div className="landing-hero-text">
+            <h1>Good food.<br/>Great company.<br/>Simple ordering.</h1>
+            <p>Scan the QR at your table<br/>to explore our menu and<br/>place your order.</p>
+            <Link href="/sips-and-bites" className="landing-btn-primary">
+              Learn More
+            </Link>
+          </div>
+          
+          <div className="landing-hero-scroll">
+            <ArrowRight style={{ transform: 'rotate(90deg)' }} size={24} strokeWidth={1} />
+          </div>
         </div>
       </section>
 
