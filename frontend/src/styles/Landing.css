@@ -168,15 +168,17 @@
   .landing-hero {
     padding: 100px 6%;
     background-image: linear-gradient(rgba(20, 18, 16, 0.7), rgba(20, 18, 16, 0.3)), url('/phone.webp');
-    text-align: left;
+    text-align: left !important;
   }
   
   .landing-hero-content {
-    align-items: flex-start;
+    align-items: flex-start !important;
+    width: 100%;
   }
   
   .landing-hero-text {
-    text-align: left;
+    width: 100%;
+    text-align: left !important;
   }
 }
 
