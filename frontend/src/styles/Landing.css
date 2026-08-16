@@ -337,6 +337,16 @@
   color: var(--lp-accent);
 }
 
+.mobile-break {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-break {
+    display: block;
+  }
+}
+
 /* Footer */
 
 .landing-footer {

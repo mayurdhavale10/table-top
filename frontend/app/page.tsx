@@ -25,7 +25,7 @@ export default function SaaSLandingPage() {
       <section className="landing-hero">
         <div className="landing-hero-content">
           <div className="landing-hero-text">
-            <h1>Simple ordering.<br/>Good food.<br/>Great company.</h1>
+            <h1>Simple<br className="mobile-break" /> ordering.<br/>Good food.<br/>Great company.</h1>
             <Link href="/sips-and-bites" className="landing-btn-primary">
               Learn More
             </Link>
