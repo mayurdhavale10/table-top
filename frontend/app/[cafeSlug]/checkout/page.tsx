@@ -13,19 +13,43 @@ export default function CheckoutPage() {
   const params = useParams();
   const cafeSlug = Array.isArray(params?.cafeSlug) ? params.cafeSlug[0] : params?.cafeSlug || "sips-and-bites";
   const [isProcessing, setIsProcessing] = useState(false);
+  const [tableNumber, setTableNumber] = useState("");
+  const [instructions, setInstructions] = useState("");
+  const [error, setError] = useState("");
 
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const tax = subtotal * 0.05; // 5% tax
   const serviceCharge = subtotal * 0.05; // 5% service charge
   const grandTotal = subtotal + tax + serviceCharge;
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
+    setError("");
     setIsProcessing(true);
-    // Simulate API call for payment & order placement
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cafeSlug,
+          tableNumber,
+          specialInstructions: instructions,
+          items: cart,
+          subtotal,
+          tax,
+          serviceCharge,
+          grandTotal,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to place order");
+
       clearCart();
       router.push(`/${cafeSlug}/order-status`);
-    }, 1500);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong. Please try again.");
+      setIsProcessing(false);
+    }
   };
 
   if (cart.length === 0) {
@@ -83,11 +107,28 @@ export default function CheckoutPage() {
 
       <div style={{ background: "#FDFBF9", padding: "24px", borderRadius: "24px", boxShadow: "0 12px 32px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: "40px" }}>
         <h2 style={{ fontSize: "18px", margin: "0 0 16px 0" }}>Details</h2>
-        <input type="text" placeholder="Table Number" style={{ width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid #D5D1CB", marginBottom: "16px", fontSize: "16px", boxSizing: "border-box" }} />
-        <textarea placeholder="Any special cooking instructions?" style={{ width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid #D5D1CB", fontSize: "16px", minHeight: "100px", fontFamily: "inherit", boxSizing: "border-box" }}></textarea>
+        <input
+          type="text"
+          placeholder="Table Number"
+          value={tableNumber}
+          onChange={(e) => setTableNumber(e.target.value)}
+          style={{ width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid #D5D1CB", marginBottom: "16px", fontSize: "16px", boxSizing: "border-box" }}
+        />
+        <textarea
+          placeholder="Any special cooking instructions?"
+          value={instructions}
+          onChange={(e) => setInstructions(e.target.value)}
+          style={{ width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid #D5D1CB", fontSize: "16px", minHeight: "100px", fontFamily: "inherit", boxSizing: "border-box" }}
+        ></textarea>
       </div>
 
-      <button onClick={handlePayment} style={{
+      {error && (
+        <div style={{ margin: "0 20px 16px 20px", padding: "12px 16px", borderRadius: "12px", background: "#FDF3F3", color: "#C62828", fontSize: "14px" }}>
+          {error}
+        </div>
+      )}
+
+      <button onClick={handlePayment} disabled={isProcessing} style={{
         width: "100%",
         background: "#1A1817",
         color: "white",
@@ -96,11 +137,12 @@ export default function CheckoutPage() {
         borderRadius: "32px",
         fontSize: "18px",
         fontWeight: "bold",
-        cursor: "pointer",
+        cursor: isProcessing ? "not-allowed" : "pointer",
+        opacity: isProcessing ? 0.7 : 1,
         boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
         transition: "0.2s"
       }}>
-        PAY & PLACE ORDER — ₹{grandTotal.toFixed(2)}
+        {isProcessing ? "PLACING ORDER..." : `PAY & PLACE ORDER — ₹${grandTotal.toFixed(2)}`}
       </button>
     </div>
   );

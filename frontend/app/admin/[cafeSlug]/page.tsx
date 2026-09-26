@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import QRCode from "react-qr-code";
@@ -117,12 +117,55 @@ export default function CafeAdminDashboard() {
     image: ""
   });
 
-  // Mock live orders data
-  const [orders, setOrders] = useState([
-    { id: "ORD-101", table: "Table 04", items: ["2x Garlic Potato Shots", "1x Cold Coffee"], total: 458, status: "new", time: "2 mins ago" },
-    { id: "ORD-102", table: "Table 09", items: ["1x Chicken Tikka", "1x Margherita Pizza"], total: 550, status: "preparing", time: "8 mins ago" },
-    { id: "ORD-103", table: "Table 02", items: ["1x Brownie", "2x Virgin Mojito"], total: 478, status: "ready", time: "15 mins ago" }
-  ]);
+  // Live orders (from MongoDB)
+  const [orders, setOrders] = useState<any[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+
+  // Analytics (from MongoDB, aggregated)
+  const [analytics, setAnalytics] = useState<{ totalOrders: number; totalRevenue: number; topItems: any[]; tip: string | null } | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [insightLoading, setInsightLoading] = useState(false);
+
+  const fetchOrders = async () => {
+    setOrdersLoading(true);
+    try {
+      const res = await fetch(`/api/orders?cafeSlug=${slug}`);
+      const data = await res.json();
+      if (res.ok) setOrders(data.orders || []);
+    } catch (err) {
+      console.error("Failed to load orders", err);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
+  const fetchAnalytics = async (withInsight = false) => {
+    if (withInsight) setInsightLoading(true);
+    else setAnalyticsLoading(true);
+    try {
+      const res = await fetch(`/api/analytics?cafeSlug=${slug}${withInsight ? "&insight=true" : ""}`);
+      const data = await res.json();
+      if (res.ok) setAnalytics(data);
+    } catch (err) {
+      console.error("Failed to load analytics", err);
+    } finally {
+      setAnalyticsLoading(false);
+      setInsightLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!slug) return;
+    fetchOrders(); // keeps the sidebar's "new orders" badge accurate at all times
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
+
+  useEffect(() => {
+    if (!slug) return;
+    if (activeTab === "orders") fetchOrders();
+    if (activeTab === "analytics" && !analytics) fetchAnalytics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, slug]);
 
   if (!cafe) {
     return (
@@ -223,8 +266,19 @@ export default function CafeAdminDashboard() {
     setTimeout(() => setCopiedUrl(false), 2500);
   };
 
-  const updateOrderStatus = (orderId, nextStatus) => {
+  const updateOrderStatus = async (orderId: string, nextStatus: string) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: nextStatus } : o));
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      if (!res.ok) throw new Error("Failed to update order status");
+    } catch (err) {
+      console.error(err);
+      fetchOrders(); // revert to server truth on failure
+    }
   };
 
   return (
@@ -265,12 +319,20 @@ export default function CafeAdminDashboard() {
             )}
           </button>
           
-          <button 
-            onClick={() => setActiveTab("qr")} 
+          <button
+            onClick={() => setActiveTab("qr")}
             className={`admin-tab ${activeTab === "qr" ? "active" : ""}`}
           >
             <span className="admin-tab-icon"><QrIcon size={18} /></span>
             <span>QR Codes</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("analytics")}
+            className={`admin-tab ${activeTab === "analytics" ? "active" : ""}`}
+          >
+            <span className="admin-tab-icon"><TrendingUp size={18} /></span>
+            <span>Analytics</span>
           </button>
         </nav>
 
@@ -489,51 +551,143 @@ export default function CafeAdminDashboard() {
               </div>
             </div>
 
-            <div className="orders-grid">
-              {orders.map(ord => (
-                <div key={ord.id} className="order-card">
-                  <div className="order-card-header">
-                    <div>
-                      <div style={{ fontWeight: "bold", fontSize: "16px", color: "var(--adm-text-primary)" }}>{ord.table}</div>
-                      <div style={{ fontSize: "12px", color: "var(--adm-text-muted)" }}>{ord.id} &bull; {ord.time}</div>
+            {ordersLoading ? (
+              <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--adm-text-muted)" }}>Loading orders...</div>
+            ) : orders.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "60px 20px", background: "#FFFFFF", borderRadius: "16px", border: "1px solid var(--adm-card-border)" }}>
+                <ChefHat size={40} style={{ color: "var(--adm-text-muted)", marginBottom: "12px" }} />
+                <h3 style={{ fontFamily: "var(--font-playfair), serif" }}>No orders yet</h3>
+                <p style={{ color: "var(--adm-text-secondary)", fontSize: "14px" }}>Orders placed from your live menu will show up here in real time.</p>
+              </div>
+            ) : (
+              <div className="orders-grid">
+                {orders.map(ord => (
+                  <div key={ord.id} className="order-card">
+                    <div className="order-card-header">
+                      <div>
+                        <div style={{ fontWeight: "bold", fontSize: "16px", color: "var(--adm-text-primary)" }}>
+                          {ord.tableNumber ? `Table ${ord.tableNumber}` : "No table given"}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "var(--adm-text-muted)" }}>
+                          #{ord.id.slice(-6).toUpperCase()} &bull; {new Date(ord.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </div>
+                      </div>
+                      <span className={`order-badge ${ord.status}`}>
+                        {ord.status}
+                      </span>
                     </div>
-                    <span className={`order-badge ${ord.status}`}>
-                      {ord.status}
-                    </span>
-                  </div>
 
-                  <div style={{ margin: "14px 0", display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {ord.items.map((it, idx) => (
-                      <div key={idx} style={{ fontSize: "13.5px", color: "var(--adm-text-secondary)", display: "flex", justifyContent: "space-between" }}>
-                        <span>{it}</span>
+                    <div style={{ margin: "14px 0", display: "flex", flexDirection: "column", gap: "6px" }}>
+                      {ord.items.map((it: any, idx: number) => (
+                        <div key={idx} style={{ fontSize: "13.5px", color: "var(--adm-text-secondary)", display: "flex", justifyContent: "space-between" }}>
+                          <span>{it.quantity}x {it.name}</span>
+                        </div>
+                      ))}
+                      {ord.specialInstructions && (
+                        <div style={{ fontSize: "12.5px", color: "var(--adm-accent)", fontStyle: "italic", marginTop: "4px" }}>
+                          Note: {ord.specialInstructions}
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ paddingTop: "12px", borderTop: "1px solid var(--adm-card-border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ fontWeight: "700", fontFamily: "var(--font-playfair), serif", color: "var(--adm-accent)", fontSize: "16px" }}>
+                        ₹{ord.grandTotal.toFixed(0)}
+                      </div>
+
+                      {ord.status === "new" && (
+                        <button onClick={() => updateOrderStatus(ord.id, "preparing")} className="btn-primary" style={{ padding: "6px 12px", fontSize: "12px" }}>
+                          Mark Preparing
+                        </button>
+                      )}
+                      {ord.status === "preparing" && (
+                        <button onClick={() => updateOrderStatus(ord.id, "ready")} className="btn-primary" style={{ padding: "6px 12px", fontSize: "12px", background: "#2E7D32" }}>
+                          Mark Ready
+                        </button>
+                      )}
+                      {ord.status === "ready" && (
+                        <button onClick={() => updateOrderStatus(ord.id, "completed")} className="btn-primary" style={{ padding: "6px 12px", fontSize: "12px", background: "#2E7D32" }}>
+                          Mark Completed
+                        </button>
+                      )}
+                      {ord.status === "completed" && (
+                        <div style={{ fontSize: "12px", color: "#2E7D32", fontWeight: "600", display: "flex", alignItems: "center", gap: "4px" }}>
+                          <Check size={14} /> Completed
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Analytics Tab */}
+        {activeTab === "analytics" && (
+          <div>
+            <div className="admin-header">
+              <div className="admin-header-title">
+                <h1>Sales Analytics</h1>
+                <p>See what's selling, what's not, and get AI-powered tips to grow revenue.</p>
+              </div>
+            </div>
+
+            {analyticsLoading ? (
+              <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--adm-text-muted)" }}>Loading analytics...</div>
+            ) : !analytics || analytics.totalOrders === 0 ? (
+              <div style={{ textAlign: "center", padding: "60px 20px", background: "#FFFFFF", borderRadius: "16px", border: "1px solid var(--adm-card-border)" }}>
+                <TrendingUp size={40} style={{ color: "var(--adm-text-muted)", marginBottom: "12px" }} />
+                <h3 style={{ fontFamily: "var(--font-playfair), serif" }}>No sales data yet</h3>
+                <p style={{ color: "var(--adm-text-secondary)", fontSize: "14px" }}>Once customers start ordering from your live menu, insights will show up here.</p>
+              </div>
+            ) : (
+              <>
+                <div className="admin-stats-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                  <div className="stat-card">
+                    <div className="stat-info">
+                      <div className="stat-label">Total Orders</div>
+                      <div className="stat-value">{analytics.totalOrders}</div>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-info">
+                      <div className="stat-label">Total Revenue</div>
+                      <div className="stat-value">₹{analytics.totalRevenue.toFixed(0)}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="analytics-panel">
+                  <h3 className="analytics-panel-title">Top Selling Items</h3>
+                  <div className="analytics-top-list">
+                    {analytics.topItems.map((item: any, idx: number) => (
+                      <div key={item.name} className="analytics-top-row">
+                        <span className="analytics-rank">{idx + 1}</span>
+                        <span className="analytics-item-name">{item.name}</span>
+                        <span className="analytics-item-qty">{item.totalQuantity} sold</span>
+                        <span className="analytics-item-revenue">₹{item.totalRevenue.toFixed(0)}</span>
                       </div>
                     ))}
                   </div>
-
-                  <div style={{ paddingTop: "12px", borderTop: "1px solid var(--adm-card-border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ fontWeight: "700", fontFamily: "var(--font-playfair), serif", color: "var(--adm-accent)", fontSize: "16px" }}>
-                      ₹{ord.total}
-                    </div>
-                    
-                    {ord.status === "new" && (
-                      <button onClick={() => updateOrderStatus(ord.id, "preparing")} className="btn-primary" style={{ padding: "6px 12px", fontSize: "12px" }}>
-                        Mark Preparing
-                      </button>
-                    )}
-                    {ord.status === "preparing" && (
-                      <button onClick={() => updateOrderStatus(ord.id, "ready")} className="btn-primary" style={{ padding: "6px 12px", fontSize: "12px", background: "#2E7D32" }}>
-                        Mark Ready
-                      </button>
-                    )}
-                    {ord.status === "ready" && (
-                      <div style={{ fontSize: "12px", color: "#2E7D32", fontWeight: "600", display: "flex", alignItems: "center", gap: "4px" }}>
-                        <Check size={14} /> Ready to Serve
-                      </div>
-                    )}
-                  </div>
                 </div>
-              ))}
-            </div>
+
+                <div className="ai-insight-card">
+                  <div className="ai-insight-header">
+                    <Sparkles size={18} />
+                    <span>AI Sales Tip</span>
+                  </div>
+                  {analytics.tip ? (
+                    <p className="ai-insight-text">{analytics.tip}</p>
+                  ) : (
+                    <p className="ai-insight-placeholder">Generate a personalized tip based on your sales data.</p>
+                  )}
+                  <button onClick={() => fetchAnalytics(true)} disabled={insightLoading} className="btn-primary" style={{ marginTop: "12px" }}>
+                    {insightLoading ? "Thinking..." : analytics.tip ? "Regenerate Tip" : "Generate Insight"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </main>
