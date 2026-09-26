@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { UtensilsCrossed } from "lucide-react";
+import { UtensilsCrossed, X } from "lucide-react";
 import "../../src/styles/Auth.css";
 
 export default function AuthPage() {
@@ -50,6 +50,9 @@ export default function AuthPage() {
   return (
     <div className="auth-container">
       <div className="auth-card">
+        <Link href="/" className="auth-close" aria-label="Close">
+          <X size={24} />
+        </Link>
         <div className="auth-header">
           <Link href="/" className="auth-logo">
             <UtensilsCrossed size={28} strokeWidth={1.5} className="logo-icon-simple" />

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import QRCode from "react-qr-code";
+import { Menu, X } from "lucide-react";
 import { getCafeBySlug, getMenuByCafeId } from "../../../src/data/saasDb";
 
 import "../../../src/styles/Admin.css";
@@ -13,34 +14,88 @@ export default function CafeAdminDashboard() {
   const slug = Array.isArray(params?.cafeSlug) ? params.cafeSlug[0] : params?.cafeSlug || "";
   const cafe = getCafeBySlug(slug);
   const [activeTab, setActiveTab] = useState("menu");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [localMenu, setLocalMenu] = useState<any[]>([]);
+  const [isScanning, setIsScanning] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
-  if (!cafe) return <div style={{ padding: "40px", textAlign: "center" }}>Cafe not found</div>;
+  useEffect(() => {
+    if (cafe) {
+      setLocalMenu(getMenuByCafeId(cafe.id));
+    }
+  }, [cafe]);
 
-  const menu = getMenuByCafeId(cafe.id);
+  const handleScanMenu = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsScanning(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch("/api/menu/scan", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to scan menu");
+
+      const newItems = data.items.map((item: any, i: number) => ({
+        id: `scanned_${Date.now()}_${i}`,
+        cafe_id: cafe?.id,
+        category: item.category?.toLowerCase() || "other",
+        name: item.name,
+        price: item.price,
+        description: item.description,
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+        type: item.type || "Veg"
+      }));
+
+      setLocalMenu(prev => [...newItems, ...prev]);
+      alert(`Successfully scanned ${newItems.length} items! Please review them.`);
+      
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setIsScanning(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  if (!cafe) return <div style={{ padding: "40px", textAlign: "center" }}>Cafe not found</div>;
 
   return (
     <div className="admin-container">
       {/* Sidebar */}
-      <div className="admin-sidebar">
-        <h2 className="admin-sidebar-title">
-          <div style={{ width: "32px", height: "32px", background: cafe.theme.primaryColor, borderRadius: "8px", flexShrink: 0 }}></div>
-          {cafe.name}
-        </h2>
+      <div className={`admin-sidebar ${isMobileMenuOpen ? "open" : ""}`}>
+        <div className="admin-sidebar-header">
+          <h2 className="admin-sidebar-title">
+            <div style={{ width: "32px", height: "32px", background: cafe.theme.primaryColor, borderRadius: "8px", flexShrink: 0 }}></div>
+            {cafe.name}
+          </h2>
+          <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
         
-        <button onClick={() => setActiveTab("menu")} className={`admin-tab ${activeTab === "menu" ? "active" : ""}`}>
-          📋 Menu Manager
-        </button>
-        <button onClick={() => setActiveTab("orders")} className={`admin-tab ${activeTab === "orders" ? "active" : ""}`}>
-          👨‍🍳 Live Orders
-        </button>
-        <button onClick={() => setActiveTab("qr")} className={`admin-tab ${activeTab === "qr" ? "active" : ""}`}>
-          📱 QR Codes
-        </button>
+        <div className="admin-sidebar-nav">
+          <button onClick={() => { setActiveTab("menu"); setIsMobileMenuOpen(false); }} className={`admin-tab ${activeTab === "menu" ? "active" : ""}`}>
+            📋 Menu Manager
+          </button>
+          <button onClick={() => { setActiveTab("orders"); setIsMobileMenuOpen(false); }} className={`admin-tab ${activeTab === "orders" ? "active" : ""}`}>
+            👨‍🍳 Live Orders
+          </button>
+          <button onClick={() => { setActiveTab("qr"); setIsMobileMenuOpen(false); }} className={`admin-tab ${activeTab === "qr" ? "active" : ""}`}>
+            📱 QR Codes
+          </button>
 
-        <div className="admin-back-link">
-          <Link href={`/${slug}`} style={{ color: "#6b7280", textDecoration: "none", fontSize: "14px" }}>
-            &larr; Back to Menu
-          </Link>
+          <div className="admin-back-link">
+            <Link href={`/${slug}`} style={{ color: "#6b7280", textDecoration: "none", fontSize: "14px" }}>
+              &larr; Back to Menu
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -50,13 +105,29 @@ export default function CafeAdminDashboard() {
           <>
             <div className="admin-header">
               <h1>Menu Manager</h1>
-              <button style={{ background: cafe.theme.primaryColor, color: "white", border: "none", padding: "10px 20px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", flexShrink: 0 }}>
-                + Add Item
-              </button>
+              <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  style={{ display: "none" }} 
+                  ref={fileInputRef}
+                  onChange={handleScanMenu}
+                />
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isScanning}
+                  style={{ background: "#f3f4f6", color: "#374151", border: "1px solid #d1d5db", padding: "10px 20px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", gap: "8px", opacity: isScanning ? 0.7 : 1 }}
+                >
+                  {isScanning ? "Scanning..." : "📷 Scan Menu"}
+                </button>
+                <button style={{ background: cafe.theme.primaryColor, color: "white", border: "none", padding: "10px 20px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", flexShrink: 0 }}>
+                  + Add Item
+                </button>
+              </div>
             </div>
 
             <div className="admin-menu-grid">
-              {menu.map(item => (
+              {localMenu.map(item => (
                 <div key={item.id} className="admin-menu-item">
                   <img src={item.image} alt={item.name} style={{ width: "80px", height: "80px", borderRadius: "8px", objectFit: "cover", flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>

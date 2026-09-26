@@ -20,6 +20,27 @@
   border-radius: 24px;
   padding: 40px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.auth-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #7A7571;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.auth-close:hover {
+  color: #1A1817;
+  transform: scale(1.1);
 }
 
 .auth-header {
