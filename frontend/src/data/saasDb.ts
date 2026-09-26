@@ -26,21 +26,21 @@ export const menuItems = [
   {
     id: "item_1",
     cafe_id: "cafe_1",
-    category: "veg",
+    category: "starters",
     name: "Veg Platter",
     price: 150,
-    description: "Assorted vegetables",
-    image: "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=400",
+    description: "Assorted fresh grilled vegetables and dips",
+    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=400",
     type: "Veg"
   },
   {
     id: "item_2",
     cafe_id: "cafe_1",
-    category: "non veg",
+    category: "starters",
     name: "Chicken Tikka",
     price: 250,
-    description: "Spicy chicken",
-    image: "https://images.unsplash.com/photo-1599487405620-681b67f1b212?auto=format&fit=crop&q=80&w=400",
+    description: "Spicy clay-oven roasted chicken skewers",
+    image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=400",
     type: "Non Veg"
   },
   {
@@ -49,7 +49,7 @@ export const menuItems = [
     category: "starters",
     name: "Bruschetta",
     price: 120,
-    description: "Toasted bread",
+    description: "Toasted garlic sourdough topped with vine tomatoes and basil",
     image: "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=400",
     type: "Veg"
   },
@@ -59,8 +59,8 @@ export const menuItems = [
     category: "pizza",
     name: "Margherita",
     price: 300,
-    description: "Cheese and tomato",
-    image: "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=400",
+    description: "Fresh buffalo mozzarella, tomato sauce and organic basil",
+    image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&q=80&w=400",
     type: "Veg"
   },
   {
@@ -69,7 +69,7 @@ export const menuItems = [
     category: "burgers",
     name: "Classic Veg",
     price: 180,
-    description: "Crispy patty",
+    description: "Handcrafted potato & herb patty with house special sauce",
     image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=400",
     type: "Veg"
   },
@@ -79,8 +79,8 @@ export const menuItems = [
     category: "pasta",
     name: "Arrabiata",
     price: 220,
-    description: "Spicy red sauce",
-    image: "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=400",
+    description: "Penne pasta tossed in spicy chili garlic pomodoro sauce",
+    image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&q=80&w=400",
     type: "Veg"
   },
   {
@@ -89,8 +89,8 @@ export const menuItems = [
     category: "drinks",
     name: "Cold Coffee",
     price: 120,
-    description: "Chilled coffee",
-    image: "https://images.unsplash.com/photo-1599487405620-681b67f1b212?auto=format&fit=crop&q=80&w=400",
+    description: "Slow-brewed dark roast espresso with chilled whole milk",
+    image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&q=80&w=400",
     type: "Veg"
   },
   {
@@ -99,13 +99,13 @@ export const menuItems = [
     category: "desserts",
     name: "Brownie",
     price: 160,
-    description: "Hot fudge brownie",
-    image: "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=400",
+    description: "Rich dark chocolate fudgy brownie served warm",
+    image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476d?auto=format&fit=crop&q=80&w=400",
     type: "Veg"
   },
   // Demo Diner Menu
   {
-    id: "item_3",
+    id: "item_9",
     cafe_id: "cafe_2",
     category: "burgers",
     name: "Classic Cheeseburger",
