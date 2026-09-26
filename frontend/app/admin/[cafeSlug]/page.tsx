@@ -20,9 +20,8 @@ import {
   UtensilsCrossed, 
   Store, 
   TrendingUp, 
-  Layers,
   Sparkles,
-  Tag
+  Camera
 } from "lucide-react";
 
 import { getCafeBySlug, getMenuByCafeId } from "../../../src/data/saasDb";
@@ -307,7 +306,8 @@ export default function CafeAdminDashboard() {
                   className="btn-primary"
                   style={{ background: "#1A1817", opacity: isScanning ? 0.7 : 1 }}
                 >
-                  <span>{isScanning ? "Scanning..." : "📷 Scan Menu"}</span>
+                  <Camera size={18} />
+                  <span>{isScanning ? "Scanning..." : "Scan Menu"}</span>
                 </button>
                 <button onClick={handleOpenAddModal} className="btn-primary">
                 <Plus size={18} />
@@ -323,7 +323,6 @@ export default function CafeAdminDashboard() {
                   <div className="stat-label">Total Items</div>
                   <div className="stat-value">{menuItemsList.length}</div>
                 </div>
-                <div className="stat-icon"><BookOpen size={22} /></div>
               </div>
 
               <div className="stat-card">
@@ -331,23 +330,20 @@ export default function CafeAdminDashboard() {
                   <div className="stat-label">Categories</div>
                   <div className="stat-value">{categoriesList.length - 1}</div>
                 </div>
-                <div className="stat-icon"><Layers size={22} /></div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card" style={{ "--adm-stat-accent": "#2E7D32" } as React.CSSProperties}>
                 <div className="stat-info">
                   <div className="stat-label">Veg Items</div>
                   <div className="stat-value">{menuItemsList.filter(i => i.type?.toLowerCase() === "veg").length}</div>
                 </div>
-                <div className="stat-icon" style={{ background: "rgba(46, 125, 50, 0.12)", color: "#2E7D32" }}><Sparkles size={22} /></div>
               </div>
 
-              <div className="stat-card">
+              <div className="stat-card" style={{ "--adm-stat-accent": "#C62828" } as React.CSSProperties}>
                 <div className="stat-info">
                   <div className="stat-label">Non-Veg Items</div>
                   <div className="stat-value">{menuItemsList.filter(i => i.type?.toLowerCase() === "non veg").length}</div>
                 </div>
-                <div className="stat-icon" style={{ background: "rgba(198, 40, 40, 0.12)", color: "#C62828" }}><Tag size={22} /></div>
               </div>
             </div>
 

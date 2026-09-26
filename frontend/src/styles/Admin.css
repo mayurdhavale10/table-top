@@ -235,11 +235,12 @@
 .stat-card {
   background: var(--adm-card-bg);
   border: 1px solid var(--adm-card-border);
-  border-radius: 14px;
-  padding: 20px;
+  border-left: 3px solid var(--adm-stat-accent, var(--adm-accent));
+  border-radius: 10px;
+  padding: 18px 22px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
@@ -247,6 +248,7 @@
 .stat-card:hover {
   transform: translateY(-2px);
   border-color: var(--adm-card-border-hover);
+  border-left-color: var(--adm-stat-accent, var(--adm-accent));
 }
 
 .stat-info .stat-label {
@@ -255,25 +257,14 @@
   color: var(--adm-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 6px;
 }
 
 .stat-info .stat-value {
   font-family: var(--font-playfair), serif;
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 600;
   color: var(--adm-text-primary);
-}
-
-.stat-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--adm-gold-soft);
-  color: var(--adm-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  line-height: 1.1;
 }
 
 /* Toolbar & Filters */
