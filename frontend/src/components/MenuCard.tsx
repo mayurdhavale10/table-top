@@ -7,10 +7,6 @@ function MenuCard({ item }) {
   
   return (
     <div className="menu-card">
-      <div className="image-container">
-        <img src={item.image} alt={item.name} />
-      </div>
-
       <div className="menu-content">
         <div className="menu-header">
           <h3>{item.name}</h3>
