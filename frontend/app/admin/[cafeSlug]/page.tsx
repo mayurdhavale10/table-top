@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import QRCode from "react-qr-code";
@@ -60,6 +60,47 @@ export default function CafeAdminDashboard() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleScanMenu = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsScanning(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch("/api/menu/scan", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to scan menu");
+
+      const newItems = data.items.map((item: any, i: number) => ({
+        id: `scanned_${Date.now()}_${i}`,
+        cafe_id: cafe?.id,
+        category: item.category?.toLowerCase() || "other",
+        name: item.name,
+        price: item.price,
+        description: item.description,
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+        type: item.type || "Veg"
+      }));
+
+      setMenuItemsList(prev => [...newItems, ...prev]);
+      alert(`Successfully scanned ${newItems.length} items! Please review them.`);
+      
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setIsScanning(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
   
   // Local menu state for instant reactivity
   const initialMenu = cafe ? getMenuByCafeId(cafe.id) : [];
@@ -252,10 +293,27 @@ export default function CafeAdminDashboard() {
                 <h1>Menu Manager</h1>
                 <p>Manage prices, dish descriptions, and category offerings in real-time.</p>
               </div>
-              <button onClick={handleOpenAddModal} className="btn-primary">
+              <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  style={{ display: "none" }} 
+                  ref={fileInputRef}
+                  onChange={handleScanMenu}
+                />
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isScanning}
+                  className="btn-primary"
+                  style={{ background: "#1A1817", opacity: isScanning ? 0.7 : 1 }}
+                >
+                  <span>{isScanning ? "Scanning..." : "📷 Scan Menu"}</span>
+                </button>
+                <button onClick={handleOpenAddModal} className="btn-primary">
                 <Plus size={18} />
                 <span>Add New Item</span>
               </button>
+              </div>
             </div>
 
             {/* Metrics Dashboard */}
