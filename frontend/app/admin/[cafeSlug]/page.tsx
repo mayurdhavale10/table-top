@@ -21,10 +21,13 @@ import {
   Store, 
   TrendingUp, 
   Sparkles,
-  Camera
+  Camera,
+  ShieldCheck,
+  AlertTriangle
 } from "lucide-react";
 
 import { getCafeBySlug, getMenuByCafeId } from "../../../src/data/saasDb";
+import { HYGIENE_CHECKLIST, HYGIENE_MAX_SCORE, STAR_LABELS } from "../../../src/data/hygieneChecklist";
 import "../../../src/styles/Admin.css";
 
 // Helper component for handling image loading errors cleanly
@@ -160,10 +163,67 @@ export default function CafeAdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
+  // Hygiene & Safety compliance tracker
+  const [hygieneView, setHygieneView] = useState<"history" | "new">("history");
+  const [hygieneAudits, setHygieneAudits] = useState<any[]>([]);
+  const [hygieneLoading, setHygieneLoading] = useState(false);
+  const [checklistResponses, setChecklistResponses] = useState<Record<number, "yes" | "no" | "na">>({});
+  const [checklistNotes, setChecklistNotes] = useState("");
+  const [submittingHygiene, setSubmittingHygiene] = useState(false);
+  const [lastHygieneResult, setLastHygieneResult] = useState<any>(null);
+
+  const totalQuestions = HYGIENE_CHECKLIST.flatMap(s => s.questions).length;
+  const answeredCount = Object.keys(checklistResponses).length;
+
+  const fetchHygieneAudits = async () => {
+    setHygieneLoading(true);
+    try {
+      const res = await fetch(`/api/hygiene?cafeSlug=${slug}`);
+      const data = await res.json();
+      if (res.ok) setHygieneAudits(data.audits || []);
+    } catch (err) {
+      console.error("Failed to load hygiene audits", err);
+    } finally {
+      setHygieneLoading(false);
+    }
+  };
+
+  const setAnswer = (questionId: number, answer: "yes" | "no" | "na") => {
+    setChecklistResponses(prev => ({ ...prev, [questionId]: answer }));
+  };
+
+  const startNewAssessment = () => {
+    setChecklistResponses({});
+    setChecklistNotes("");
+    setLastHygieneResult(null);
+    setHygieneView("new");
+  };
+
+  const submitAssessment = async () => {
+    setSubmittingHygiene(true);
+    try {
+      const res = await fetch("/api/hygiene", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cafeSlug: slug, responses: checklistResponses, notes: checklistNotes }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to submit assessment");
+      setLastHygieneResult(data);
+      setHygieneView("history");
+      fetchHygieneAudits();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSubmittingHygiene(false);
+    }
+  };
+
   useEffect(() => {
     if (!slug) return;
     if (activeTab === "orders") fetchOrders();
     if (activeTab === "analytics" && !analytics) fetchAnalytics();
+    if (activeTab === "hygiene" && hygieneAudits.length === 0) fetchHygieneAudits();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, slug]);
 
@@ -333,6 +393,14 @@ export default function CafeAdminDashboard() {
           >
             <span className="admin-tab-icon"><TrendingUp size={18} /></span>
             <span>Analytics</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("hygiene")}
+            className={`admin-tab ${activeTab === "hygiene" ? "active" : ""}`}
+          >
+            <span className="admin-tab-icon"><ShieldCheck size={18} /></span>
+            <span>Hygiene & Safety</span>
           </button>
         </nav>
 
@@ -686,6 +754,148 @@ export default function CafeAdminDashboard() {
                     {insightLoading ? "Thinking..." : analytics.tip ? "Regenerate Tip" : "Generate Insight"}
                   </button>
                 </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Hygiene & Safety Tab */}
+        {activeTab === "hygiene" && (
+          <div>
+            <div className="admin-header">
+              <div className="admin-header-title">
+                <h1>Hygiene & Safety</h1>
+                <p>Self-assessment against FSSAI's official Hygiene Rating checklist. Keep a running audit trail ready for any inspection.</p>
+              </div>
+              {hygieneView === "history" && (
+                <button onClick={startNewAssessment} className="btn-primary">
+                  <Plus size={18} />
+                  <span>New Self-Assessment</span>
+                </button>
+              )}
+            </div>
+
+            {hygieneView === "new" ? (
+              <div>
+                <div className="analytics-panel" style={{ position: "sticky", top: 0, zIndex: 5, display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                  <div>
+                    <div style={{ fontWeight: 600, color: "var(--adm-text-primary)" }}>Answered {answeredCount} of {totalQuestions}</div>
+                    <div style={{ fontSize: "12.5px", color: "var(--adm-text-secondary)" }}>Items marked with a red badge are FSSAI-critical: a "No" here means automatic non-compliance.</div>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button onClick={() => setHygieneView("history")} className="btn-icon-action" style={{ padding: "10px 18px", fontSize: "14px" }}>
+                      Cancel
+                    </button>
+                    <button
+                      onClick={submitAssessment}
+                      disabled={submittingHygiene || answeredCount < totalQuestions}
+                      className="btn-primary"
+                      title={answeredCount < totalQuestions ? "Answer every question to submit" : ""}
+                    >
+                      {submittingHygiene ? "Submitting..." : "Submit Assessment"}
+                    </button>
+                  </div>
+                </div>
+
+                {HYGIENE_CHECKLIST.map((section) => (
+                  <div key={section.section} className="analytics-panel">
+                    <h3 className="analytics-panel-title">{section.section}</h3>
+                    {section.questions.map((q) => (
+                      <div key={q.id} className="checklist-question">
+                        <div className="checklist-question-text">
+                          <span className="checklist-question-number">{q.id}.</span> {q.text}
+                          {q.critical && <span className="critical-badge">Critical</span>}
+                          {q.note && <div className="checklist-question-note">{q.note}</div>}
+                        </div>
+                        <div className="checklist-answer-group">
+                          <button
+                            onClick={() => setAnswer(q.id, "yes")}
+                            className={`checklist-answer-btn yes ${checklistResponses[q.id] === "yes" ? "active" : ""}`}
+                          >
+                            Yes
+                          </button>
+                          <button
+                            onClick={() => setAnswer(q.id, "no")}
+                            className={`checklist-answer-btn no ${checklistResponses[q.id] === "no" ? "active" : ""}`}
+                          >
+                            No
+                          </button>
+                          <button
+                            onClick={() => setAnswer(q.id, "na")}
+                            className={`checklist-answer-btn na ${checklistResponses[q.id] === "na" ? "active" : ""}`}
+                          >
+                            N/A
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+
+                <div className="analytics-panel">
+                  <h3 className="analytics-panel-title">Notes (optional)</h3>
+                  <textarea
+                    value={checklistNotes}
+                    onChange={(e) => setChecklistNotes(e.target.value)}
+                    placeholder="Anything specific to flag for this assessment (e.g. pending repairs, staff on leave)..."
+                    rows={3}
+                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid var(--adm-card-border)", fontSize: "14px", fontFamily: "inherit", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+            ) : hygieneLoading ? (
+              <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--adm-text-muted)" }}>Loading hygiene records...</div>
+            ) : hygieneAudits.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "60px 20px", background: "#FFFFFF", borderRadius: "16px", border: "1px solid var(--adm-card-border)" }}>
+                <ShieldCheck size={40} style={{ color: "var(--adm-text-muted)", marginBottom: "12px" }} />
+                <h3 style={{ fontFamily: "var(--font-playfair), serif" }}>No self-assessments yet</h3>
+                <p style={{ color: "var(--adm-text-secondary)", fontSize: "14px" }}>Run your first hygiene self-assessment against the official FSSAI checklist to start building your audit trail.</p>
+              </div>
+            ) : (
+              <>
+                <div className="hygiene-summary-card">
+                  <div>
+                    <div style={{ fontSize: "12.5px", fontWeight: 500, color: "var(--adm-text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
+                      Latest Self-Assessment
+                    </div>
+                    <div style={{ fontFamily: "var(--font-playfair), serif", fontSize: "28px", fontWeight: 600, color: hygieneAudits[0].hasCriticalFailure ? "#C62828" : "var(--adm-text-primary)" }}>
+                      {hygieneAudits[0].hasCriticalFailure ? "Non-Compliant" : `${hygieneAudits[0].starRating} / 5 Stars`}
+                    </div>
+                    <div style={{ fontSize: "13px", color: "var(--adm-text-secondary)", marginTop: "4px" }}>
+                      {STAR_LABELS[hygieneAudits[0].starRating]} &bull; {hygieneAudits[0].earnedScore}/{hygieneAudits[0].possibleScore} points ({hygieneAudits[0].percentage.toFixed(0)}%)
+                      &bull; {new Date(hygieneAudits[0].createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  {hygieneAudits[0].hasCriticalFailure && (
+                    <div className="hygiene-critical-warning">
+                      <AlertTriangle size={18} />
+                      <span>A critical FSSAI item failed. Address it before your next inspection.</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="analytics-panel">
+                  <h3 className="analytics-panel-title">Assessment History</h3>
+                  <div className="analytics-top-list">
+                    {hygieneAudits.map((audit) => (
+                      <div key={audit.id} className="hygiene-history-row">
+                        <span style={{ fontSize: "13.5px", color: "var(--adm-text-secondary)" }}>
+                          {new Date(audit.createdAt).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })}
+                        </span>
+                        <span style={{ fontSize: "13.5px", fontWeight: 600, color: "var(--adm-text-primary)" }}>
+                          {audit.earnedScore}/{audit.possibleScore} pts ({audit.percentage.toFixed(0)}%)
+                        </span>
+                        <span className={`hygiene-status-pill ${audit.hasCriticalFailure ? "fail" : ""}`}>
+                          {audit.hasCriticalFailure ? "Non-Compliant" : `${audit.starRating}★ ${STAR_LABELS[audit.starRating]}`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <p style={{ fontSize: "12px", color: "var(--adm-text-muted)", fontStyle: "italic" }}>
+                  This is a self-assessment tool based on FSSAI's published Hygiene Rating checklist. It is not an official government rating — official certification requires validation by a Hygiene Rating Audit Agency or Food Safety Officer.
+                </p>
               </>
             )}
           </div>

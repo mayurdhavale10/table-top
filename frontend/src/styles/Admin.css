@@ -838,3 +838,156 @@
   margin: 0;
   font-style: italic;
 }
+
+/* Hygiene & Safety Checklist */
+.checklist-question {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--adm-card-border);
+}
+
+.checklist-question:last-child {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.checklist-question-text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--adm-text-primary);
+  flex: 1;
+}
+
+.checklist-question-number {
+  color: var(--adm-text-muted);
+  font-weight: 600;
+}
+
+.checklist-question-note {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--adm-text-secondary);
+  font-style: italic;
+}
+
+.critical-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: rgba(198, 40, 40, 0.1);
+  color: var(--adm-nonveg-red);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.checklist-answer-group {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.checklist-answer-btn {
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--adm-card-border);
+  background: #FFFFFF;
+  color: var(--adm-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.checklist-answer-btn.yes.active {
+  background: var(--adm-veg-green-bg);
+  border-color: var(--adm-veg-green);
+  color: var(--adm-veg-green);
+}
+
+.checklist-answer-btn.no.active {
+  background: rgba(198, 40, 40, 0.1);
+  border-color: var(--adm-nonveg-red);
+  color: var(--adm-nonveg-red);
+}
+
+.checklist-answer-btn.na.active {
+  background: var(--adm-card-border);
+  border-color: var(--adm-card-border-hover);
+  color: var(--adm-text-primary);
+}
+
+@media (max-width: 600px) {
+  .checklist-question {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.hygiene-summary-card {
+  background: var(--adm-card-bg);
+  border: 1px solid var(--adm-card-border);
+  border-left: 3px solid var(--adm-accent);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.hygiene-critical-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(198, 40, 40, 0.08);
+  color: var(--adm-nonveg-red);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 320px;
+}
+
+.hygiene-history-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--adm-card-border);
+}
+
+.hygiene-history-row:last-child {
+  border-bottom: none;
+}
+
+.hygiene-status-pill {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--adm-veg-green-bg);
+  color: var(--adm-veg-green);
+  white-space: nowrap;
+}
+
+.hygiene-status-pill.fail {
+  background: rgba(198, 40, 40, 0.1);
+  color: var(--adm-nonveg-red);
+}
+
+@media (max-width: 600px) {
+  .hygiene-history-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
