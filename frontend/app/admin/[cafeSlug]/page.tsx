@@ -23,11 +23,16 @@ import {
   Sparkles,
   Camera,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
+  Paperclip
 } from "lucide-react";
 
 import { getCafeBySlug, getMenuByCafeId } from "../../../src/data/saasDb";
-import { HYGIENE_CHECKLIST, HYGIENE_MAX_SCORE, STAR_LABELS } from "../../../src/data/hygieneChecklist";
+import { HYGIENE_CHECKLIST, HYGIENE_MAX_SCORE, STAR_LABELS, computeCriticalEvidenceStats } from "../../../src/data/hygieneChecklist";
+import { compressImage } from "../../../src/lib/compressImage";
+
+const ALL_HYGIENE_QUESTIONS = HYGIENE_CHECKLIST.flatMap((s) => s.questions);
+const getHygieneQuestionById = (id: number) => ALL_HYGIENE_QUESTIONS.find((q) => q.id === id);
 import "../../../src/styles/Admin.css";
 
 // Helper component for handling image loading errors cleanly
@@ -171,6 +176,8 @@ export default function CafeAdminDashboard() {
   const [checklistNotes, setChecklistNotes] = useState("");
   const [submittingHygiene, setSubmittingHygiene] = useState(false);
   const [lastHygieneResult, setLastHygieneResult] = useState<any>(null);
+  const [evidenceState, setEvidenceState] = useState<Record<number, { url?: string; validUntil?: string; uploading?: boolean }>>({});
+  const [expandedAuditId, setExpandedAuditId] = useState<string | null>(null);
 
   const totalQuestions = HYGIENE_CHECKLIST.flatMap(s => s.questions).length;
   const answeredCount = Object.keys(checklistResponses).length;
@@ -195,17 +202,46 @@ export default function CafeAdminDashboard() {
   const startNewAssessment = () => {
     setChecklistResponses({});
     setChecklistNotes("");
+    setEvidenceState({});
     setLastHygieneResult(null);
     setHygieneView("new");
+  };
+
+  const handleEvidenceUpload = async (questionId: number, file: File) => {
+    setEvidenceState(prev => ({ ...prev, [questionId]: { ...prev[questionId], uploading: true } }));
+    try {
+      const compressed = await compressImage(file);
+      const formData = new FormData();
+      formData.append("file", compressed);
+      formData.append("cafeSlug", slug);
+
+      const res = await fetch("/api/hygiene/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      setEvidenceState(prev => ({ ...prev, [questionId]: { ...prev[questionId], url: data.url, uploading: false } }));
+    } catch (err: any) {
+      alert(err.message);
+      setEvidenceState(prev => ({ ...prev, [questionId]: { ...prev[questionId], uploading: false } }));
+    }
+  };
+
+  const setEvidenceExpiry = (questionId: number, date: string) => {
+    setEvidenceState(prev => ({ ...prev, [questionId]: { ...prev[questionId], validUntil: date } }));
   };
 
   const submitAssessment = async () => {
     setSubmittingHygiene(true);
     try {
+      const evidencePayload: Record<number, { url: string; validUntil?: string }> = {};
+      Object.entries(evidenceState).forEach(([qid, ev]) => {
+        if (ev.url) evidencePayload[Number(qid)] = { url: ev.url, validUntil: ev.validUntil };
+      });
+
       const res = await fetch("/api/hygiene", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cafeSlug: slug, responses: checklistResponses, notes: checklistNotes }),
+        body: JSON.stringify({ cafeSlug: slug, responses: checklistResponses, evidence: evidencePayload, notes: checklistNotes }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit assessment");
@@ -806,6 +842,43 @@ export default function CafeAdminDashboard() {
                           <span className="checklist-question-number">{q.id}.</span> {q.text}
                           {q.critical && <span className="critical-badge">Critical</span>}
                           {q.note && <div className="checklist-question-note">{q.note}</div>}
+                          {q.evidence && (
+                            <div className="evidence-control">
+                              <label className="evidence-upload-btn">
+                                <Paperclip size={13} />
+                                {evidenceState[q.id]?.uploading
+                                  ? "Uploading..."
+                                  : evidenceState[q.id]?.url
+                                  ? "Replace evidence"
+                                  : `Attach ${q.evidence.label}`}
+                                <input
+                                  type="file"
+                                  accept={q.evidence.type === "live_photo" ? "image/*" : "image/*,.pdf,application/pdf"}
+                                  capture={q.evidence.type === "live_photo" ? "environment" : undefined}
+                                  style={{ display: "none" }}
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleEvidenceUpload(q.id, file);
+                                    e.target.value = "";
+                                  }}
+                                />
+                              </label>
+                              {evidenceState[q.id]?.url && (
+                                <a href={evidenceState[q.id].url} target="_blank" rel="noreferrer" className="evidence-view-link">
+                                  View attached
+                                </a>
+                              )}
+                              {q.evidence.expiryMonths && evidenceState[q.id]?.url && (
+                                <input
+                                  type="date"
+                                  value={evidenceState[q.id]?.validUntil || ""}
+                                  onChange={(e) => setEvidenceExpiry(q.id, e.target.value)}
+                                  className="evidence-date-input"
+                                  title="Valid until"
+                                />
+                              )}
+                            </div>
+                          )}
                         </div>
                         <div className="checklist-answer-group">
                           <button
@@ -853,43 +926,113 @@ export default function CafeAdminDashboard() {
               </div>
             ) : (
               <>
-                <div className="hygiene-summary-card">
-                  <div>
-                    <div style={{ fontSize: "12.5px", fontWeight: 500, color: "var(--adm-text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
-                      Latest Self-Assessment
+                {(() => {
+                  const latest = hygieneAudits[0];
+                  const latestEvidenceMap: Record<number, { url: string }> = {};
+                  latest.responses.forEach((r: any) => {
+                    if (r.evidenceUrl) latestEvidenceMap[r.questionId] = { url: r.evidenceUrl };
+                  });
+                  const criticalStats = computeCriticalEvidenceStats(latestEvidenceMap);
+                  const now = new Date();
+                  const expiredItems = latest.responses.filter(
+                    (r: any) => r.validUntil && new Date(r.validUntil) < now
+                  );
+
+                  return (
+                    <div className="hygiene-summary-card">
+                      <div>
+                        <div style={{ fontSize: "12.5px", fontWeight: 500, color: "var(--adm-text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
+                          Latest Self-Assessment
+                        </div>
+                        <div style={{ fontFamily: "var(--font-playfair), serif", fontSize: "28px", fontWeight: 600, color: latest.hasCriticalFailure ? "#C62828" : "var(--adm-text-primary)" }}>
+                          {latest.hasCriticalFailure ? "Non-Compliant" : `${latest.starRating} / 5 Stars`}
+                        </div>
+                        <div style={{ fontSize: "13px", color: "var(--adm-text-secondary)", marginTop: "4px" }}>
+                          {STAR_LABELS[latest.starRating]} &bull; {latest.earnedScore}/{latest.possibleScore} points ({latest.percentage.toFixed(0)}%)
+                          &bull; {new Date(latest.createdAt).toLocaleDateString()}
+                        </div>
+                        {criticalStats.total > 0 && (
+                          <div style={{ fontSize: "12.5px", color: "var(--adm-text-secondary)", marginTop: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <Paperclip size={12} />
+                            {criticalStats.verified}/{criticalStats.total} critical items backed by evidence
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {latest.hasCriticalFailure && (
+                          <div className="hygiene-critical-warning">
+                            <AlertTriangle size={18} />
+                            <span>A critical FSSAI item failed. Address it before your next inspection.</span>
+                          </div>
+                        )}
+                        {expiredItems.length > 0 && (
+                          <div className="hygiene-critical-warning">
+                            <AlertTriangle size={18} />
+                            <span>{expiredItems.length} evidence document{expiredItems.length > 1 ? "s have" : " has"} expired — renewal needed.</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ fontFamily: "var(--font-playfair), serif", fontSize: "28px", fontWeight: 600, color: hygieneAudits[0].hasCriticalFailure ? "#C62828" : "var(--adm-text-primary)" }}>
-                      {hygieneAudits[0].hasCriticalFailure ? "Non-Compliant" : `${hygieneAudits[0].starRating} / 5 Stars`}
-                    </div>
-                    <div style={{ fontSize: "13px", color: "var(--adm-text-secondary)", marginTop: "4px" }}>
-                      {STAR_LABELS[hygieneAudits[0].starRating]} &bull; {hygieneAudits[0].earnedScore}/{hygieneAudits[0].possibleScore} points ({hygieneAudits[0].percentage.toFixed(0)}%)
-                      &bull; {new Date(hygieneAudits[0].createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                  {hygieneAudits[0].hasCriticalFailure && (
-                    <div className="hygiene-critical-warning">
-                      <AlertTriangle size={18} />
-                      <span>A critical FSSAI item failed. Address it before your next inspection.</span>
-                    </div>
-                  )}
-                </div>
+                  );
+                })()}
 
                 <div className="analytics-panel">
                   <h3 className="analytics-panel-title">Assessment History</h3>
+                  <p style={{ fontSize: "12.5px", color: "var(--adm-text-muted)", marginTop: "-10px", marginBottom: "14px" }}>
+                    Click a row to view its attached evidence.
+                  </p>
                   <div className="analytics-top-list">
-                    {hygieneAudits.map((audit) => (
-                      <div key={audit.id} className="hygiene-history-row">
-                        <span style={{ fontSize: "13.5px", color: "var(--adm-text-secondary)" }}>
-                          {new Date(audit.createdAt).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })}
-                        </span>
-                        <span style={{ fontSize: "13.5px", fontWeight: 600, color: "var(--adm-text-primary)" }}>
-                          {audit.earnedScore}/{audit.possibleScore} pts ({audit.percentage.toFixed(0)}%)
-                        </span>
-                        <span className={`hygiene-status-pill ${audit.hasCriticalFailure ? "fail" : ""}`}>
-                          {audit.hasCriticalFailure ? "Non-Compliant" : `${audit.starRating}★ ${STAR_LABELS[audit.starRating]}`}
-                        </span>
-                      </div>
-                    ))}
+                    {hygieneAudits.map((audit) => {
+                      const evidenceResponses = audit.responses.filter((r: any) => r.evidenceUrl);
+                      const isExpanded = expandedAuditId === audit.id;
+                      return (
+                        <div key={audit.id}>
+                          <div
+                            className="hygiene-history-row"
+                            onClick={() => setExpandedAuditId(isExpanded ? null : audit.id)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <span style={{ fontSize: "13.5px", color: "var(--adm-text-secondary)", display: "flex", alignItems: "center", gap: "6px" }}>
+                              {new Date(audit.createdAt).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })}
+                              {evidenceResponses.length > 0 && <Paperclip size={12} />}
+                            </span>
+                            <span style={{ fontSize: "13.5px", fontWeight: 600, color: "var(--adm-text-primary)" }}>
+                              {audit.earnedScore}/{audit.possibleScore} pts ({audit.percentage.toFixed(0)}%)
+                            </span>
+                            <span className={`hygiene-status-pill ${audit.hasCriticalFailure ? "fail" : ""}`}>
+                              {audit.hasCriticalFailure ? "Non-Compliant" : `${audit.starRating}★ ${STAR_LABELS[audit.starRating]}`}
+                            </span>
+                          </div>
+                          {isExpanded && (
+                            <div className="hygiene-evidence-panel">
+                              {evidenceResponses.length === 0 ? (
+                                <span style={{ fontSize: "12.5px", color: "var(--adm-text-muted)", fontStyle: "italic" }}>
+                                  No evidence was attached to this submission.
+                                </span>
+                              ) : (
+                                evidenceResponses.map((r: any) => {
+                                  const q = getHygieneQuestionById(r.questionId);
+                                  const isExpired = r.validUntil && new Date(r.validUntil) < new Date();
+                                  return (
+                                    <div key={r.questionId} className="hygiene-evidence-item">
+                                      <a href={r.evidenceUrl} target="_blank" rel="noreferrer">
+                                        <Paperclip size={12} /> {q?.evidence?.label || `Item ${r.questionId}`}
+                                      </a>
+                                      {r.validUntil && (
+                                        <span className={isExpired ? "expired" : ""}>
+                                          valid until {new Date(r.validUntil).toLocaleDateString()}
+                                          {isExpired && " — EXPIRED"}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 

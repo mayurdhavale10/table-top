@@ -7,7 +7,7 @@ import { computeHygieneScore } from '../../../src/data/hygieneChecklist';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { cafeSlug, responses, notes } = body;
+    const { cafeSlug, responses, evidence, notes } = body;
 
     if (!cafeSlug || !responses || typeof responses !== 'object') {
       return NextResponse.json({ error: 'cafeSlug and responses are required' }, { status: 400 });
@@ -22,10 +22,16 @@ export async function POST(req: NextRequest) {
 
     const { earned, possible, percentage, starRating, hasCriticalFailure } = computeHygieneScore(responses);
 
-    const responseList = Object.entries(responses as Record<string, 'yes' | 'no' | 'na'>).map(([questionId, answer]) => ({
-      questionId: Number(questionId),
-      answer,
-    }));
+    const evidenceMap: Record<string, { url: string; validUntil?: string }> = evidence || {};
+    const responseList = Object.entries(responses as Record<string, 'yes' | 'no' | 'na'>).map(([questionId, answer]) => {
+      const ev = evidenceMap[questionId];
+      return {
+        questionId: Number(questionId),
+        answer,
+        evidenceUrl: ev?.url || undefined,
+        validUntil: ev?.validUntil ? new Date(ev.validUntil) : undefined,
+      };
+    });
 
     const [audit] = await HygieneAudit.create([{
       cafe_id: (cafe as any)._id,

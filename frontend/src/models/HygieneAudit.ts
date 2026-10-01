@@ -3,6 +3,8 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IChecklistResponse {
   questionId: number;
   answer: 'yes' | 'no' | 'na';
+  evidenceUrl?: string;
+  validUntil?: Date;
 }
 
 export interface IHygieneAudit extends Document {
@@ -19,6 +21,8 @@ export interface IHygieneAudit extends Document {
 const ChecklistResponseSchema = new Schema<IChecklistResponse>({
   questionId: { type: Number, required: true },
   answer: { type: String, enum: ['yes', 'no', 'na'], required: true },
+  evidenceUrl: { type: String },
+  validUntil: { type: Date },
 }, { _id: false });
 
 const HygieneAuditSchema: Schema = new Schema({

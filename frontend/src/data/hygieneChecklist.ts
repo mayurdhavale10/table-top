@@ -3,12 +3,21 @@
 // Critical (starred) items cause automatic non-compliance if answered "No", per FSSAI's own rule:
 // "Failure in any of the asterisk mark questions will lead to Non-compliance."
 
+export type EvidenceType = "document" | "live_photo";
+
+export type EvidenceConfig = {
+  type: EvidenceType;
+  label: string;
+  expiryMonths?: number; // if set, the attached evidence has a "valid until" date to track
+};
+
 export type ChecklistQuestion = {
   id: number;
   text: string;
   note?: string;
   points: 2 | 4;
   critical: boolean;
+  evidence?: EvidenceConfig;
 };
 
 export type ChecklistSection = {
@@ -26,6 +35,7 @@ export const HYGIENE_CHECKLIST: ChecklistSection[] = [
         note: "The FSDBs are readable to both Food Handlers and Customers.",
         points: 2,
         critical: false,
+        evidence: { type: "document", label: "FSSAI license / FSDB photo" },
       },
     ],
   },
@@ -44,6 +54,7 @@ export const HYGIENE_CHECKLIST: ChecklistSection[] = [
         note: "Not mandatory if using Municipal Corporation water, subject to maintaining water bill records.",
         points: 4,
         critical: true,
+        evidence: { type: "document", label: "Water testing lab report", expiryMonths: 6 },
       },
       { id: 9, text: "Equipment and containers are made of non-toxic, impervious, non-corrosive material which is easy to clean & disinfect.", points: 2, critical: false },
       { id: 10, text: "Adequate facilities for heating, cooling, refrigeration and freezing food & facilitate monitoring of temperature.", points: 2, critical: false },
@@ -57,7 +68,7 @@ export const HYGIENE_CHECKLIST: ChecklistSection[] = [
   {
     section: "Control of Operations",
     questions: [
-      { id: 16, text: "Incoming material is procured as per internally laid down specification from approved vendors. Check for records (certificate of analysis, Form E, specifications, supplier details, batch no., mfg./expiry date, quantity). Only permitted colors and flavors are used.", points: 2, critical: false },
+      { id: 16, text: "Incoming material is procured as per internally laid down specification from approved vendors. Check for records (certificate of analysis, Form E, specifications, supplier details, batch no., mfg./expiry date, quantity). Only permitted colors and flavors are used.", points: 2, critical: false, evidence: { type: "document", label: "Vendor invoice / Certificate of Analysis" } },
       { id: 17, text: "Raw materials are inspected at the time of receiving for food safety hazards. Raw and finished products are free from visible adulteration.", points: 2, critical: false },
       { id: 18, text: "Incoming material, semi or final products are stored according to their temperature requirement in a hygienic environment. FIFO & FEFO is practiced.", points: 2, critical: false },
       { id: 19, text: "Foods of animal origin are stored at a temperature less than or equal to 4°C.", points: 2, critical: false },
@@ -97,7 +108,7 @@ export const HYGIENE_CHECKLIST: ChecklistSection[] = [
         points: 4,
         critical: true,
       },
-      { id: 29, text: "Oil being used is suitable for cooking purposes. Periodic verification of fat and oil by checking color, flavor and floated elements.", points: 2, critical: false },
+      { id: 29, text: "Oil being used is suitable for cooking purposes. Periodic verification of fat and oil by checking color, flavor and floated elements.", points: 2, critical: false, evidence: { type: "live_photo", label: "Oil TPC test strip/meter reading" } },
       { id: 30, text: "Unused/fresh oil with not more than 15% Total Polar Compounds (TPC), and used oil with not more than 25% TPC, is used for food preparation.", points: 2, critical: false },
       { id: 31, text: "Appropriate records are maintained if oil consumption is more than 50 L/day.", points: 2, critical: false },
       {
@@ -120,7 +131,7 @@ export const HYGIENE_CHECKLIST: ChecklistSection[] = [
       { id: 38, text: "Preventive maintenance of equipment and machinery is carried out regularly as per manufacturer instructions. Check for records.", points: 2, critical: false },
       { id: 39, text: "Measuring & monitoring devices are calibrated periodically.", points: 2, critical: false },
       { id: 40, text: "Pest control program is available & pest control activities are carried out by trained and experienced personnel. Check for records.", points: 2, critical: false },
-      { id: 41, text: "No signs of pest activity or infestation in premises (eggs, larvae, feces etc.)", points: 4, critical: true },
+      { id: 41, text: "No signs of pest activity or infestation in premises (eggs, larvae, feces etc.)", points: 4, critical: true, evidence: { type: "document", label: "Pest control agency's visit report", expiryMonths: 3 } },
       { id: 42, text: "Drains are designed to meet expected flow loads and equipped with grease and cockroach traps.", points: 2, critical: false },
       { id: 43, text: "Food waste and other refuse are removed periodically from food handling areas to avoid accumulation.", points: 2, critical: false },
     ],
@@ -128,13 +139,14 @@ export const HYGIENE_CHECKLIST: ChecklistSection[] = [
   {
     section: "Personal Hygiene",
     questions: [
-      { id: 44, text: "Annual medical examination & inoculation of food handlers against the enteric group of diseases is done as per recommended schedule. Check for records.", points: 2, critical: false },
+      { id: 44, text: "Annual medical examination & inoculation of food handlers against the enteric group of diseases is done as per recommended schedule. Check for records.", points: 2, critical: false, evidence: { type: "document", label: "Staff medical certificate", expiryMonths: 12 } },
       { id: 45, text: "No person suffering from a disease or illness, or with open wounds or burns, is involved in handling food or food-contact materials.", points: 2, critical: false },
       {
         id: 46,
         text: "Food handlers maintain personal cleanliness (clean clothes, trimmed nails, waterproof bandages) and personal behavior (hand washing, no loose jewellery, no smoking, no spitting).",
         points: 4,
         critical: true,
+        evidence: { type: "live_photo", label: "Staff hygiene / PPE photo" },
       },
       { id: 47, text: "Food handlers are equipped with suitable aprons, gloves, headgear etc. wherever necessary.", points: 2, critical: false },
     ],
@@ -144,7 +156,7 @@ export const HYGIENE_CHECKLIST: ChecklistSection[] = [
     questions: [
       { id: 48, text: "Internal / External audit of the system is done periodically. Check for records.", points: 2, critical: false },
       { id: 49, text: "Food Business has an effective consumer complaints redressal mechanism.", points: 2, critical: false },
-      { id: 50, text: "Food handlers have the necessary knowledge and skills & are trained to handle food safely. Check for training records.", points: 2, critical: false },
+      { id: 50, text: "Food handlers have the necessary knowledge and skills & are trained to handle food safely. Check for training records.", points: 2, critical: false, evidence: { type: "document", label: "FoSTaC training certificate" } },
       {
         id: 51,
         text: "Appropriate documentation & records are available and retained for a period of one year (or as applicable), whichever is more.",
@@ -192,6 +204,18 @@ export function computeHygieneScore(responses: Record<number, "yes" | "no" | "na
   }
 
   return { earned, possible, percentage, starRating, hasCriticalFailure };
+}
+
+export function getEvidenceEligibleQuestions() {
+  return HYGIENE_CHECKLIST.flatMap((s) => s.questions).filter((q) => q.evidence);
+}
+
+export function computeCriticalEvidenceStats(evidenceByQuestion: Record<number, { url: string } | undefined>) {
+  const criticalWithEvidence = HYGIENE_CHECKLIST.flatMap((s) => s.questions).filter(
+    (q) => q.critical && q.evidence
+  );
+  const verifiedCount = criticalWithEvidence.filter((q) => evidenceByQuestion[q.id]?.url).length;
+  return { total: criticalWithEvidence.length, verified: verifiedCount };
 }
 
 export const STAR_LABELS: Record<number, string> = {
