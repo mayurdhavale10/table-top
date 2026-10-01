@@ -64,17 +64,32 @@ export default function CafeAdminDashboard() {
 
   const [cafe, setCafe] = useState<any>(null);
   const [cafeLoading, setCafeLoading] = useState(true);
+  const [cafeError, setCafeError] = useState(false);
   const [menuLoading, setMenuLoading] = useState(true);
+
+  // Guards against a hung/slow request leaving the dashboard stuck on a loading
+  // screen forever (e.g. a cold-start DB connection or a flaky mobile connection).
+  const fetchWithTimeout = (url: string, options: RequestInit = {}, timeoutMs = 15000) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+  };
 
   const fetchCafe = async () => {
     setCafeLoading(true);
+    setCafeError(false);
     try {
-      const res = await fetch(`/api/cafe?slug=${slug}`);
+      const res = await fetchWithTimeout(`/api/cafe?slug=${slug}`);
       const data = await res.json();
-      setCafe(res.ok ? data.cafe : null);
+      if (res.ok) {
+        setCafe(data.cafe);
+      } else {
+        setCafe(null);
+      }
     } catch (err) {
       console.error("Failed to load cafe", err);
       setCafe(null);
+      setCafeError(true);
     } finally {
       setCafeLoading(false);
     }
@@ -83,7 +98,7 @@ export default function CafeAdminDashboard() {
   const fetchMenuItems = async () => {
     setMenuLoading(true);
     try {
-      const res = await fetch(`/api/menu-items?cafeSlug=${slug}`);
+      const res = await fetchWithTimeout(`/api/menu-items?cafeSlug=${slug}`);
       const data = await res.json();
       if (res.ok) setMenuItemsList(data.items || []);
     } catch (err) {
@@ -189,7 +204,7 @@ export default function CafeAdminDashboard() {
   const fetchOrders = async () => {
     setOrdersLoading(true);
     try {
-      const res = await fetch(`/api/orders?cafeSlug=${slug}`);
+      const res = await fetchWithTimeout(`/api/orders?cafeSlug=${slug}`);
       const data = await res.json();
       if (res.ok) setOrders(data.orders || []);
     } catch (err) {
@@ -203,7 +218,11 @@ export default function CafeAdminDashboard() {
     if (withInsight) setInsightLoading(true);
     else setAnalyticsLoading(true);
     try {
-      const res = await fetch(`/api/analytics?cafeSlug=${slug}${withInsight ? "&insight=true" : ""}`);
+      const res = await fetchWithTimeout(
+        `/api/analytics?cafeSlug=${slug}${withInsight ? "&insight=true" : ""}`,
+        {},
+        withInsight ? 30000 : 15000 // AI insight generation legitimately takes longer than a plain read
+      );
       const data = await res.json();
       if (res.ok) setAnalytics(data);
     } catch (err) {
@@ -237,7 +256,7 @@ export default function CafeAdminDashboard() {
   const fetchHygieneAudits = async () => {
     setHygieneLoading(true);
     try {
-      const res = await fetch(`/api/hygiene?cafeSlug=${slug}`);
+      const res = await fetchWithTimeout(`/api/hygiene?cafeSlug=${slug}`);
       const data = await res.json();
       if (res.ok) setHygieneAudits(data.audits || []);
     } catch (err) {
@@ -328,11 +347,23 @@ export default function CafeAdminDashboard() {
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#FAF8F5", color: "#1A1817" }}>
         <div style={{ textAlign: "center", padding: "40px" }}>
           <Store size={48} style={{ color: "#8B2E2E", marginBottom: "16px" }} />
-          <h2 style={{ fontFamily: "var(--font-playfair), serif" }}>Cafe Not Found</h2>
-          <p style={{ color: "#7A7571" }}>The cafe slug &quot;{slug}&quot; was not found in our records.</p>
-          <Link href="/" className="btn-primary" style={{ marginTop: "16px" }}>
-            Return to Homepage
-          </Link>
+          <h2 style={{ fontFamily: "var(--font-playfair), serif" }}>
+            {cafeError ? "Couldn't load dashboard" : "Cafe Not Found"}
+          </h2>
+          <p style={{ color: "#7A7571" }}>
+            {cafeError
+              ? "That took too long or your connection dropped. Check your internet and try again."
+              : <>The cafe slug &quot;{slug}&quot; was not found in our records.</>}
+          </p>
+          {cafeError ? (
+            <button onClick={fetchCafe} className="btn-primary" style={{ marginTop: "16px" }}>
+              Retry
+            </button>
+          ) : (
+            <Link href="/" className="btn-primary" style={{ marginTop: "16px" }}>
+              Return to Homepage
+            </Link>
+          )}
         </div>
       </div>
     );
