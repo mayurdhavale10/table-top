@@ -24,7 +24,8 @@ import {
   Camera,
   ShieldCheck,
   AlertTriangle,
-  Paperclip
+  Paperclip,
+  Menu as MenuIcon
 } from "lucide-react";
 
 import { HYGIENE_CHECKLIST, HYGIENE_MAX_SCORE, STAR_LABELS, computeCriticalEvidenceStats } from "../../../src/data/hygieneChecklist";
@@ -100,6 +101,12 @@ export default function CafeAdminDashboard() {
   }, [slug]);
 
   const [activeTab, setActiveTab] = useState("menu");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const goToTab = (tab: string) => {
+    setActiveTab(tab);
+    setMobileNavOpen(false);
+  };
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedUrl, setCopiedUrl] = useState(false);
@@ -465,21 +472,28 @@ export default function CafeAdminDashboard() {
             <h2 className="admin-sidebar-title">{cafe.name}</h2>
             <div className="admin-sidebar-subtitle">{cafe.location}</div>
           </div>
+          <button
+            className="admin-mobile-menu-toggle"
+            onClick={() => setMobileNavOpen(prev => !prev)}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileNavOpen ? <X size={20} /> : <MenuIcon size={20} />}
+          </button>
         </div>
 
-        <nav className="admin-nav-group">
+        <nav className={`admin-nav-group ${mobileNavOpen ? "mobile-open" : ""}`}>
           <div className="admin-nav-label">Management</div>
-          
-          <button 
-            onClick={() => setActiveTab("menu")} 
+
+          <button
+            onClick={() => goToTab("menu")}
             className={`admin-tab ${activeTab === "menu" ? "active" : ""}`}
           >
             <span className="admin-tab-icon"><BookOpen size={18} /></span>
             <span>Menu Manager</span>
           </button>
-          
-          <button 
-            onClick={() => setActiveTab("orders")} 
+
+          <button
+            onClick={() => goToTab("orders")}
             className={`admin-tab ${activeTab === "orders" ? "active" : ""}`}
           >
             <span className="admin-tab-icon"><ChefHat size={18} /></span>
@@ -490,9 +504,9 @@ export default function CafeAdminDashboard() {
               </span>
             )}
           </button>
-          
+
           <button
-            onClick={() => setActiveTab("qr")}
+            onClick={() => goToTab("qr")}
             className={`admin-tab ${activeTab === "qr" ? "active" : ""}`}
           >
             <span className="admin-tab-icon"><QrIcon size={18} /></span>
@@ -500,7 +514,7 @@ export default function CafeAdminDashboard() {
           </button>
 
           <button
-            onClick={() => setActiveTab("analytics")}
+            onClick={() => goToTab("analytics")}
             className={`admin-tab ${activeTab === "analytics" ? "active" : ""}`}
           >
             <span className="admin-tab-icon"><TrendingUp size={18} /></span>
@@ -508,7 +522,7 @@ export default function CafeAdminDashboard() {
           </button>
 
           <button
-            onClick={() => setActiveTab("hygiene")}
+            onClick={() => goToTab("hygiene")}
             className={`admin-tab ${activeTab === "hygiene" ? "active" : ""}`}
           >
             <span className="admin-tab-icon"><ShieldCheck size={18} /></span>

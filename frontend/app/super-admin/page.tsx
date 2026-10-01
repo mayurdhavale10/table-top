@@ -2,13 +2,19 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Building2, Settings, ArrowLeft, Plus, Shield, CheckCircle2, UtensilsCrossed } from "lucide-react";
+import { Building2, Settings, ArrowLeft, Plus, Shield, CheckCircle2, UtensilsCrossed, Menu as MenuIcon, X } from "lucide-react";
 import "../../src/styles/Admin.css";
 
 export default function SuperAdminPage() {
   const [activeTab, setActiveTab] = useState("cafes");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [cafes, setCafes] = useState<any[]>([]);
   const [cafesLoading, setCafesLoading] = useState(true);
+
+  const goToTab = (tab: string) => {
+    setActiveTab(tab);
+    setMobileNavOpen(false);
+  };
 
   useEffect(() => {
     fetch("/api/cafes")
@@ -30,21 +36,28 @@ export default function SuperAdminPage() {
             <h2 className="admin-sidebar-title">Super Admin</h2>
             <div className="admin-sidebar-subtitle">Table Top Platform</div>
           </div>
+          <button
+            className="admin-mobile-menu-toggle"
+            onClick={() => setMobileNavOpen(prev => !prev)}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileNavOpen ? <X size={20} /> : <MenuIcon size={20} />}
+          </button>
         </div>
 
-        <nav className="admin-nav-group">
+        <nav className={`admin-nav-group ${mobileNavOpen ? "mobile-open" : ""}`}>
           <div className="admin-nav-label">Platform Controls</div>
-          
-          <button 
-            onClick={() => setActiveTab("cafes")} 
+
+          <button
+            onClick={() => goToTab("cafes")}
             className={`admin-tab ${activeTab === "cafes" ? "active" : ""}`}
           >
             <span className="admin-tab-icon"><Building2 size={18} /></span>
             <span>Manage Cafes</span>
           </button>
-          
-          <button 
-            onClick={() => setActiveTab("settings")} 
+
+          <button
+            onClick={() => goToTab("settings")}
             className={`admin-tab ${activeTab === "settings" ? "active" : ""}`}
           >
             <span className="admin-tab-icon"><Settings size={18} /></span>

@@ -61,6 +61,10 @@
   padding: 0 8px;
 }
 
+.admin-mobile-menu-toggle {
+  display: none;
+}
+
 .admin-brand-icon {
   width: 38px;
   height: 38px;
@@ -695,49 +699,38 @@
     position: relative;
   }
 
-  /* Hints that the tab row scrolls horizontally, since not all tabs fit on screen.
-     A color-only fade is invisible when nothing happens to be clipped at the current
-     scroll position, so a chevron makes the "more tabs" affordance unambiguous. */
-  .admin-sidebar::after {
-    content: "\276F";
-    position: absolute;
-    top: 75px;
-    height: 42px;
-    right: 4px;
-    width: 28px;
+  .admin-sidebar-brand {
+    margin-bottom: 0;
+    justify-content: space-between;
+  }
+
+  /* Hamburger toggle: hidden on desktop (shown via the rule below), shown on mobile */
+  .admin-mobile-menu-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
-    color: var(--adm-sidebar-muted);
-    background: linear-gradient(to right, transparent, var(--adm-sidebar-bg) 60%);
-    pointer-events: none;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--adm-sidebar-border);
+    border-radius: 10px;
+    color: var(--adm-sidebar-text);
+    cursor: pointer;
   }
 
-  .admin-sidebar-brand {
-    margin-bottom: 16px;
-  }
-
+  /* Collapsed by default; expands into a full-width vertical list when toggled open */
   .admin-nav-group {
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 8px;
-    padding-bottom: 4px;
-    scrollbar-width: none;
+    display: none;
+    margin-top: 16px;
   }
 
-  .admin-nav-group::-webkit-scrollbar {
-    display: none;
-  }
-
-  .admin-nav-label {
-    display: none;
+  .admin-nav-group.mobile-open {
+    display: flex;
   }
 
   .admin-tab {
-    padding: 8px 14px;
-    white-space: nowrap;
-    width: auto;
+    width: 100%;
   }
 
   .admin-sidebar-footer {
