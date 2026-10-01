@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
+import { callGroq, GROQ_VISION_MODEL } from "../../../../src/lib/groq";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,53 +10,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "GEMINI_API_KEY is not configured in .env.local" },
-        { status: 500 }
-      );
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
-    
-    // Read the file as an ArrayBuffer and convert to Base64 for the API
     const arrayBuffer = await imageFile.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString("base64");
+    const dataUri = `data:${imageFile.type};base64,${base64Data}`;
 
-    const prompt = `You are an expert at extracting menu items from restaurant menus. 
-Please look at this menu image and extract all the dishes.
-Return a valid JSON array of objects, where each object has these exact fields:
+    const prompt = `You are an expert at extracting menu items from restaurant menus.
+Look at this menu image and extract all the dishes.
+Respond with a JSON object of the exact shape {"items": [...]}, where each entry in "items" has these exact fields:
 - "name" (string): the name of the dish
 - "description" (string): brief description if available, else empty string
 - "price" (number): the price of the dish as a plain number (e.g., 250)
 - "category" (string): the category or section (e.g., "Starters", "Pizza")
 - "type" (string): "Veg" or "Non Veg" (infer if possible, otherwise guess "Veg")
 
-Do not include any other text, markdown blocks, or formatting, just the raw JSON array.`;
+Return only the JSON object, no other text or markdown.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        prompt,
-        {
-          inlineData: {
-            data: base64Data,
-            mimeType: imageFile.type,
-          },
-        },
+    const raw = await callGroq({
+      model: GROQ_VISION_MODEL,
+      jsonMode: true,
+      content: [
+        { type: "text", text: prompt },
+        { type: "image_url", image_url: { url: dataUri } },
       ],
     });
 
-    const textResponse = response.text || "[]";
-    
-    // Strip out markdown code blocks if the AI returned them despite instructions
-    const cleanJson = textResponse.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-
-    const parsedItems = JSON.parse(cleanJson);
+    const cleanJson = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const parsed = JSON.parse(cleanJson);
+    const parsedItems = Array.isArray(parsed) ? parsed : parsed.items || [];
 
     return NextResponse.json({ items: parsedItems });
-
   } catch (error: any) {
     console.error("Scan Menu Error:", error);
     return NextResponse.json(

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { callGroq, GROQ_TEXT_MODEL } from '../../../src/lib/groq';
 import connectToDatabase from '../../../src/lib/mongodb';
 import Cafe from '../../../src/models/Cafe';
 import Order from '../../../src/models/Order';
@@ -46,23 +46,16 @@ export async function GET(req: NextRequest) {
 
     let tip: string | null = null;
     if (wantInsight && topItems.length > 0) {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (apiKey) {
-        try {
-          const ai = new GoogleGenAI({ apiKey });
-          const summary = topItems
-            .map((i) => `${i.name}: ${i.totalQuantity} sold, ₹${i.totalRevenue} revenue`)
-            .join('; ');
-          const prompt = `You are a restaurant business advisor. Based on this sales data for a cafe (${totalOrders} total orders, ₹${totalRevenue} total revenue): ${summary}. Give one short, specific, actionable tip (2-3 sentences max) to help the cafe owner increase sales. Be concrete, mention actual item names from the data. No markdown, no preamble, just the tip.`;
+      try {
+        const summary = topItems
+          .map((i) => `${i.name}: ${i.totalQuantity} sold, ₹${i.totalRevenue} revenue`)
+          .join('; ');
+        const prompt = `You are a restaurant business advisor. Based on this sales data for a cafe (${totalOrders} total orders, ₹${totalRevenue} total revenue): ${summary}. Give one short, specific, actionable tip (2-3 sentences max) to help the cafe owner increase sales. Be concrete, mention actual item names from the data. No markdown, no preamble, just the tip.`;
 
-          const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: [prompt],
-          });
-          tip = (response.text || '').trim() || null;
-        } catch (aiError) {
-          console.error('AI Insight Error:', aiError);
-        }
+        const raw = await callGroq({ model: GROQ_TEXT_MODEL, content: prompt });
+        tip = raw.trim() || null;
+      } catch (aiError) {
+        console.error('AI Insight Error:', aiError);
       }
     }
 
