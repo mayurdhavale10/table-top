@@ -19,6 +19,8 @@ export async function GET() {
         slug: cafe.slug,
         name: cafe.name,
         location: cafe.location,
+        username: (cafe as any).username,
+        password: (cafe as any).password,
         theme: cafe.theme,
       });
       insertedCafes.push({ oldId: cafe.id, newId: newCafe._id });

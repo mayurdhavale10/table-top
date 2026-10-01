@@ -2,6 +2,8 @@ export const cafes = [
   {
     id: "cafe_1",
     slug: "sips-and-bites",
+    username: "sips",
+    password: "bites123",
     name: "Sips & Bites",
     location: "KHADAKPADA, KALYAN WEST",
     theme: {
