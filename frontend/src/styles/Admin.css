@@ -692,6 +692,26 @@
     border-right: none;
     border-bottom: 1px solid var(--adm-sidebar-border);
     padding: 16px 20px;
+    position: relative;
+  }
+
+  /* Hints that the tab row scrolls horizontally, since not all tabs fit on screen.
+     A color-only fade is invisible when nothing happens to be clipped at the current
+     scroll position, so a chevron makes the "more tabs" affordance unambiguous. */
+  .admin-sidebar::after {
+    content: "\276F";
+    position: absolute;
+    top: 75px;
+    height: 42px;
+    right: 4px;
+    width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--adm-sidebar-muted);
+    background: linear-gradient(to right, transparent, var(--adm-sidebar-bg) 60%);
+    pointer-events: none;
   }
 
   .admin-sidebar-brand {

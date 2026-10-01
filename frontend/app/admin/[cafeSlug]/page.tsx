@@ -27,7 +27,6 @@ import {
   Paperclip
 } from "lucide-react";
 
-import { getCafeBySlug, getMenuByCafeId } from "../../../src/data/saasDb";
 import { HYGIENE_CHECKLIST, HYGIENE_MAX_SCORE, STAR_LABELS, computeCriticalEvidenceStats } from "../../../src/data/hygieneChecklist";
 import { compressImage } from "../../../src/lib/compressImage";
 
@@ -61,7 +60,44 @@ function ImageWithFallback({ src, alt, className, style }) {
 export default function CafeAdminDashboard() {
   const params = useParams();
   const slug = Array.isArray(params?.cafeSlug) ? params.cafeSlug[0] : params?.cafeSlug || "";
-  const cafe = getCafeBySlug(slug);
+
+  const [cafe, setCafe] = useState<any>(null);
+  const [cafeLoading, setCafeLoading] = useState(true);
+  const [menuLoading, setMenuLoading] = useState(true);
+
+  const fetchCafe = async () => {
+    setCafeLoading(true);
+    try {
+      const res = await fetch(`/api/cafe?slug=${slug}`);
+      const data = await res.json();
+      setCafe(res.ok ? data.cafe : null);
+    } catch (err) {
+      console.error("Failed to load cafe", err);
+      setCafe(null);
+    } finally {
+      setCafeLoading(false);
+    }
+  };
+
+  const fetchMenuItems = async () => {
+    setMenuLoading(true);
+    try {
+      const res = await fetch(`/api/menu-items?cafeSlug=${slug}`);
+      const data = await res.json();
+      if (res.ok) setMenuItemsList(data.items || []);
+    } catch (err) {
+      console.error("Failed to load menu items", err);
+    } finally {
+      setMenuLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!slug) return;
+    fetchCafe();
+    fetchMenuItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   const [activeTab, setActiveTab] = useState("menu");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -87,20 +123,29 @@ export default function CafeAdminDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to scan menu");
 
-      const newItems = data.items.map((item: any, i: number) => ({
-        id: `scanned_${Date.now()}_${i}`,
-        cafe_id: cafe?.id,
-        category: item.category?.toLowerCase() || "other",
-        name: item.name,
-        price: item.price,
-        description: item.description,
-        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
-        type: item.type || "Veg"
-      }));
+      // Persist each scanned item to MongoDB so it actually shows up on the live menu
+      const createdItems = [];
+      for (const item of data.items) {
+        const createRes = await fetch("/api/menu-items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cafeSlug: slug,
+            name: item.name,
+            category: item.category?.toLowerCase() || "other",
+            price: item.price,
+            description: item.description,
+            image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+            type: item.type || "Veg",
+          }),
+        });
+        const createData = await createRes.json();
+        if (createRes.ok) createdItems.push(createData.item);
+      }
 
-      setMenuItemsList(prev => [...newItems, ...prev]);
-      alert(`Successfully scanned ${newItems.length} items! Please review them.`);
-      
+      setMenuItemsList(prev => [...createdItems, ...prev]);
+      alert(`Successfully scanned and saved ${createdItems.length} items! Please review them.`);
+
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -110,12 +155,12 @@ export default function CafeAdminDashboard() {
   };
   
   // Local menu state for instant reactivity
-  const initialMenu = cafe ? getMenuByCafeId(cafe.id) : [];
-  const [menuItemsList, setMenuItemsList] = useState(initialMenu);
+  const [menuItemsList, setMenuItemsList] = useState<any[]>([]);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [savingItem, setSavingItem] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     category: "starters",
@@ -263,6 +308,14 @@ export default function CafeAdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, slug]);
 
+  if (cafeLoading) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#FAF8F5", color: "#7A7571" }}>
+        Loading dashboard...
+      </div>
+    );
+  }
+
   if (!cafe) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#FAF8F5", color: "#1A1817" }}>
@@ -316,42 +369,65 @@ export default function CafeAdminDashboard() {
     setIsModalOpen(true);
   };
 
-  const handleSaveItem = (e) => {
+  const handleSaveItem = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.price) return;
 
-    if (editingItem) {
-      // Edit existing
-      setMenuItemsList(prev => prev.map(item => item.id === editingItem.id ? {
-        ...item,
-        name: formData.name,
-        category: formData.category,
-        type: formData.type,
-        price: Number(formData.price),
-        description: formData.description,
-        image: formData.image || item.image
-      } : item));
-    } else {
-      // Add new
-      const newItem = {
-        id: `item_${Date.now()}`,
-        cafe_id: cafe.id,
-        name: formData.name,
-        category: formData.category,
-        type: formData.type,
-        price: Number(formData.price),
-        description: formData.description,
-        image: formData.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400"
-      };
-      setMenuItemsList(prev => [newItem, ...prev]);
+    setSavingItem(true);
+    try {
+      if (editingItem) {
+        const res = await fetch(`/api/menu-items/${editingItem.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.name,
+            category: formData.category,
+            type: formData.type,
+            price: Number(formData.price),
+            description: formData.description,
+            image: formData.image || editingItem.image,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to update item");
+        setMenuItemsList(prev => prev.map(item => item.id === editingItem.id ? data.item : item));
+      } else {
+        const res = await fetch("/api/menu-items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cafeSlug: slug,
+            name: formData.name,
+            category: formData.category,
+            type: formData.type,
+            price: Number(formData.price),
+            description: formData.description,
+            image: formData.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to create item");
+        setMenuItemsList(prev => [data.item, ...prev]);
+      }
+      setIsModalOpen(false);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSavingItem(false);
     }
-
-    setIsModalOpen(false);
   };
 
-  const handleDeleteItem = (itemId) => {
-    if (confirm("Are you sure you want to remove this item from your menu?")) {
+  const handleDeleteItem = async (itemId) => {
+    if (!confirm("Are you sure you want to remove this item from your menu?")) return;
+    try {
+      const res = await fetch(`/api/menu-items/${itemId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to delete item");
+      }
       setMenuItemsList(prev => prev.filter(item => item.id !== itemId));
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
@@ -539,11 +615,13 @@ export default function CafeAdminDashboard() {
             </div>
 
             {/* Menu Grid */}
-            {filteredItems.length === 0 ? (
+            {menuLoading ? (
+              <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--adm-text-muted)" }}>Loading menu...</div>
+            ) : filteredItems.length === 0 ? (
               <div style={{ textAlign: "center", padding: "60px 20px", background: "#FFFFFF", borderRadius: "16px", border: "1px solid var(--adm-card-border)" }}>
                 <BookOpen size={40} style={{ color: "var(--adm-text-muted)", marginBottom: "12px" }} />
                 <h3 style={{ fontFamily: "var(--font-playfair), serif" }}>No menu items found</h3>
-                <p style={{ color: "var(--adm-text-secondary)", fontSize: "14px" }}>Try adjusting your search query or category filter.</p>
+                <p style={{ color: "var(--adm-text-secondary)", fontSize: "14px" }}>{menuItemsList.length === 0 ? "Add your first dish, or scan an existing menu to get started." : "Try adjusting your search query or category filter."}</p>
               </div>
             ) : (
               <div className="admin-menu-grid">
@@ -1121,8 +1199,8 @@ export default function CafeAdminDashboard() {
                 <button type="button" onClick={() => setIsModalOpen(false)} className="btn-icon-action" style={{ padding: "10px 18px", fontSize: "14px" }}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
-                  {editingItem ? "Save Changes" : "Create Item"}
+                <button type="submit" className="btn-primary" disabled={savingItem}>
+                  {savingItem ? "Saving..." : editingItem ? "Save Changes" : "Create Item"}
                 </button>
               </div>
             </form>
