@@ -8,6 +8,7 @@ export interface IOrderItem {
 }
 
 export type OrderStatus = 'new' | 'preparing' | 'ready' | 'completed';
+export type PaymentStatus = 'pending' | 'paid';
 
 export interface IOrder extends Document {
   cafe_id: mongoose.Types.ObjectId;
@@ -19,6 +20,7 @@ export interface IOrder extends Document {
   grandTotal: number;
   specialInstructions?: string;
   status: OrderStatus;
+  paymentStatus: PaymentStatus;
 }
 
 const OrderItemSchema = new Schema<IOrderItem>({
@@ -38,6 +40,7 @@ const OrderSchema: Schema = new Schema({
   grandTotal: { type: Number, required: true },
   specialInstructions: { type: String, default: '' },
   status: { type: String, enum: ['new', 'preparing', 'ready', 'completed'], default: 'new' },
+  paymentStatus: { type: String, enum: ['pending', 'paid'], default: 'paid' },
 }, { timestamps: true });
 
 const Order: Model<IOrder> = mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema);

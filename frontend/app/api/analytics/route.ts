@@ -23,8 +23,10 @@ export async function GET(req: NextRequest) {
 
     const totalOrders = await Order.countDocuments({ cafe_id: cafeId });
 
+    // Revenue figures only count confirmed-paid orders, so a round of unconfirmed UPI
+    // payments never gets reported as money actually collected.
     const topItems = await Order.aggregate([
-      { $match: { cafe_id: cafeId } },
+      { $match: { cafe_id: cafeId, paymentStatus: 'paid' } },
       { $unwind: '$items' },
       {
         $group: {
@@ -39,7 +41,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     const revenueAgg = await Order.aggregate([
-      { $match: { cafe_id: cafeId } },
+      { $match: { cafe_id: cafeId, paymentStatus: 'paid' } },
       { $group: { _id: null, total: { $sum: '$grandTotal' } } },
     ]);
     const totalRevenue = revenueAgg[0]?.total || 0;

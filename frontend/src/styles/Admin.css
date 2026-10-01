@@ -679,6 +679,39 @@
   color: #2E7D32;
 }
 
+.payment-pending-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: #FFF8E1;
+  border: 1px solid rgba(201, 161, 90, 0.35);
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #92400E;
+}
+
+.payment-pending-banner span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.payment-pending-banner button {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #92400E;
+  color: #FFF8E1;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 /* Responsive Rules */
 @media (max-width: 1024px) {
   .admin-stats-grid {

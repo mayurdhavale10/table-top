@@ -6,6 +6,7 @@ export interface ICafe extends Document {
   location: string;
   username?: string;
   password?: string;
+  upiId?: string;
   theme: {
     primaryColor: string;
     accentColor: string;
@@ -18,6 +19,7 @@ const CafeSchema: Schema = new Schema({
   location: { type: String, required: true },
   username: { type: String, unique: true, sparse: true },
   password: { type: String },
+  upiId: { type: String, default: '' },
   theme: {
     primaryColor: { type: String, default: '#1A1817' },
     accentColor: { type: String, default: '#d97706' },

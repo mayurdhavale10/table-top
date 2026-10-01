@@ -6,7 +6,7 @@ import Order from '../../../src/models/Order';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { cafeSlug, tableNumber, specialInstructions, items, subtotal, tax, serviceCharge, grandTotal } = body;
+    const { cafeSlug, tableNumber, specialInstructions, items, subtotal, tax, serviceCharge, grandTotal, paymentStatus } = body;
 
     if (!cafeSlug || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'cafeSlug and at least one item are required' }, { status: 400 });
@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
       grandTotal,
       specialInstructions: specialInstructions || '',
       status: 'new',
+      paymentStatus: paymentStatus === 'pending' ? 'pending' : 'paid',
     });
 
     return NextResponse.json({ success: true, orderId: order._id.toString() }, { status: 201 });

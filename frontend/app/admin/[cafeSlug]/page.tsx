@@ -25,7 +25,9 @@ import {
   ShieldCheck,
   AlertTriangle,
   Paperclip,
-  Menu as MenuIcon
+  Menu as MenuIcon,
+  Wallet,
+  Clock
 } from "lucide-react";
 
 import { HYGIENE_CHECKLIST, HYGIENE_MAX_SCORE, STAR_LABELS, computeCriticalEvidenceStats } from "../../../src/data/hygieneChecklist";
@@ -125,6 +127,34 @@ export default function CafeAdminDashboard() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [upiIdInput, setUpiIdInput] = useState("");
+  const [savingUpi, setSavingUpi] = useState(false);
+  const [upiSaved, setUpiSaved] = useState(false);
+
+  useEffect(() => {
+    if (cafe?.upiId !== undefined) setUpiIdInput(cafe.upiId);
+  }, [cafe?.upiId]);
+
+  const handleSaveUpiId = async () => {
+    setSavingUpi(true);
+    setUpiSaved(false);
+    try {
+      const res = await fetchWithTimeout("/api/cafe", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, upiId: upiIdInput }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save UPI ID");
+      setCafe(data.cafe);
+      setUpiSaved(true);
+      setTimeout(() => setUpiSaved(false), 2500);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSavingUpi(false);
+    }
+  };
   const [isScanning, setIsScanning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -491,6 +521,21 @@ export default function CafeAdminDashboard() {
     }
   };
 
+  const confirmPayment = async (orderId: string) => {
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, paymentStatus: "paid" } : o));
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentStatus: "paid" }),
+      });
+      if (!res.ok) throw new Error("Failed to confirm payment");
+    } catch (err) {
+      console.error(err);
+      fetchOrders();
+    }
+  };
+
   return (
     <div className="admin-container">
       {/* Sidebar */}
@@ -756,14 +801,41 @@ export default function CafeAdminDashboard() {
                   <ExternalLink size={16} />
                   <span>Preview Live</span>
                 </a>
-                <button 
-                  onClick={() => alert("Downloading printable PDF flyer...")} 
-                  className="btn-primary" 
+                <button
+                  onClick={() => alert("Downloading printable PDF flyer...")}
+                  className="btn-primary"
                   style={{ flex: 1, justifyContent: "center" }}
                 >
                   Download Printable QR
                 </button>
               </div>
+            </div>
+
+            <div className="analytics-panel" style={{ maxWidth: "420px" }}>
+              <h3 className="analytics-panel-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Wallet size={18} /> Payment Settings
+              </h3>
+              <p style={{ fontSize: "13px", color: "var(--adm-text-secondary)", marginTop: "-8px", marginBottom: "16px" }}>
+                Customers pay you directly via UPI &mdash; Table Top never touches the money. Enter your UPI ID and we'll generate a QR code with the exact order amount at checkout.
+              </p>
+              <label style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--adm-text-secondary)", display: "block", marginBottom: "6px" }}>
+                Your UPI ID
+              </label>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <input
+                  type="text"
+                  value={upiIdInput}
+                  onChange={(e) => setUpiIdInput(e.target.value)}
+                  placeholder="yourcafe@okaxis"
+                  style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--adm-card-border)", fontSize: "14px" }}
+                />
+                <button onClick={handleSaveUpiId} disabled={savingUpi} className="btn-primary" style={{ padding: "10px 18px" }}>
+                  {savingUpi ? "Saving..." : upiSaved ? <Check size={16} /> : "Save"}
+                </button>
+              </div>
+              <p style={{ fontSize: "12px", color: cafe.upiId ? "var(--adm-veg-green)" : "var(--adm-text-muted)", marginTop: "10px", marginBottom: 0 }}>
+                {cafe.upiId ? "✓ Payments configured — checkout will show your UPI QR." : "Not configured yet — checkout will skip the payment step until you add this."}
+              </p>
             </div>
           </div>
         )}
@@ -803,6 +875,13 @@ export default function CafeAdminDashboard() {
                         {ord.status}
                       </span>
                     </div>
+
+                    {ord.paymentStatus === "pending" && (
+                      <div className="payment-pending-banner">
+                        <span><Clock size={13} /> Payment not yet confirmed</span>
+                        <button onClick={() => confirmPayment(ord.id)}>Confirm Payment</button>
+                      </div>
+                    )}
 
                     <div style={{ margin: "14px 0", display: "flex", flexDirection: "column", gap: "6px" }}>
                       {ord.items.map((it: any, idx: number) => (
