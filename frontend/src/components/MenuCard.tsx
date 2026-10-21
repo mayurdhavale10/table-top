@@ -22,13 +22,13 @@ function MenuCard({ item }) {
         <div className="card-info">
           {item.type && (
             <span className="pill-tag">
-              {item.type === "Veg" ? <Leaf size={12} color="#16a34a" /> : <Drumstick size={12} color="#dc2626" />}
+              {item.type === "Veg" ? <Leaf size={12} color="#2E7D32" /> : <Drumstick size={12} color="#C62828" />}
               {item.type}
             </span>
           )}
           {item.calories && (
             <span className="pill-tag">
-              <Flame size={12} color="#f97316" /> {item.calories}
+              <Flame size={12} color="#8B2E2E" /> {item.calories}
             </span>
           )}
           {item.allergens && item.allergens.length > 0 && item.allergens.map((allergen: string) => (

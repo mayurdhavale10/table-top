@@ -632,11 +632,11 @@ export default function CafeAdminDashboard() {
                   ref={fileInputRef}
                   onChange={handleScanMenu}
                 />
-                <button 
+                <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isScanning}
-                  className="btn-primary"
-                  style={{ background: "#1A1817", opacity: isScanning ? 0.7 : 1 }}
+                  className="btn-secondary"
+                  style={{ opacity: isScanning ? 0.7 : 1 }}
                 >
                   <Camera size={18} />
                   <span>{isScanning ? "Scanning..." : "Scan Menu"}</span>
