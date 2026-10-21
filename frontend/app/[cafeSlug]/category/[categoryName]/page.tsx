@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import "../../../../src/styles/CategoryPage.css";
-import { getCafeBySlug, getMenuByCafeId } from "../../../../src/lib/data";
+import { getCafeBySlug, getMenuByCafeId, getRatingsByCafeId } from "../../../../src/lib/data";
 import { notFound } from "next/navigation";
 import CategoryItemsList from "../../../../src/components/CategoryItemsList";
 
@@ -15,10 +15,13 @@ export default async function CategoryPage({
   const cafe = await getCafeBySlug(cafeSlug);
   if (!cafe) notFound();
 
-  const menu = await getMenuByCafeId(cafe._id);
-  const items = menu.filter(
-    (item) => item.category.toLowerCase() === categoryName.toLowerCase()
-  );
+  const [menu, ratings] = await Promise.all([
+    getMenuByCafeId(cafe._id),
+    getRatingsByCafeId(cafe._id),
+  ]);
+  const items = menu
+    .filter((item) => item.category.toLowerCase() === categoryName.toLowerCase())
+    .map((item) => ({ ...item, rating: ratings[item.id] }));
 
   const formattedCategoryName = categoryName
     ? categoryName.charAt(0).toUpperCase() + categoryName.slice(1)

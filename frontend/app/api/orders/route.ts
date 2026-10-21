@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectToDatabase from '../../../src/lib/mongodb';
 import Cafe from '../../../src/models/Cafe';
 import Order from '../../../src/models/Order';
+import Customer from '../../../src/models/Customer';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { cafeSlug, tableNumber, specialInstructions, items, subtotal, tax, serviceCharge, grandTotal, paymentStatus } = body;
+    const { cafeSlug, tableNumber, customerPhone, specialInstructions, items, subtotal, tax, serviceCharge, grandTotal, paymentStatus } = body;
 
     if (!cafeSlug || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'cafeSlug and at least one item are required' }, { status: 400 });
@@ -19,9 +20,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Cafe not found' }, { status: 404 });
     }
 
+    const phone = (customerPhone || '').trim();
+    if (phone) {
+      // Lightweight identity: upsert so repeat diners resolve to the same Customer record.
+      await Customer.findOneAndUpdate({ phone }, { phone }, { upsert: true, new: true, setDefaultsOnInsert: true });
+    }
+
     const order = await Order.create({
       cafe_id: (cafe as any)._id,
       tableNumber: tableNumber || '',
+      customerPhone: phone,
       items: items.map((item: any) => ({
         menuItemId: item.id,
         name: item.name,

@@ -54,6 +54,12 @@
   display: flex;
   align-items: center;
   gap: 2px;
+  white-space: nowrap;
+}
+
+.rating-count {
+  font-weight: 500;
+  opacity: 0.85;
 }
 
 .description {

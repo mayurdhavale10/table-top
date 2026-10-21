@@ -10,7 +10,11 @@ function MenuCard({ item }) {
       <div className="menu-content">
         <div className="menu-header">
           <h3>{item.name}</h3>
-          <div className="rating">★ {item.rating || 4.5}</div>
+          {item.rating?.count > 0 && (
+            <div className="rating" title={`${item.rating.count} verified diner${item.rating.count > 1 ? "s" : ""}`}>
+              ★ {item.rating.avgStars} <span className="rating-count">({item.rating.count})</span>
+            </div>
+          )}
         </div>
 
         <p className="description">{item.description}</p>

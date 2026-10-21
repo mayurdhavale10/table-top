@@ -16,6 +16,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [tableNumber, setTableNumber] = useState("");
   const [instructions, setInstructions] = useState("");
+  const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [cafe, setCafe] = useState<any>(null);
   const [step, setStep] = useState<"details" | "payment">("details");
@@ -25,6 +26,11 @@ export default function CheckoutPage() {
       .then((res) => res.json())
       .then((data) => setCafe(data.cafe || null))
       .catch(() => setCafe(null));
+
+    // Remember the diner's number locally so repeat visits don't require retyping it --
+    // this is also what lets them rate dishes afterward as a verified diner.
+    const savedPhone = localStorage.getItem("tabletop_phone");
+    if (savedPhone) setPhone(savedPhone);
   }, [cafeSlug]);
 
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -37,8 +43,14 @@ export default function CheckoutPage() {
     ? `upi://pay?pa=${encodeURIComponent(cafe.upiId)}&pn=${encodeURIComponent(cafe.name || "Table Top")}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(`Order at ${cafe.name || "cafe"}`)}`
     : "";
 
+  const phoneValid = phone.replace(/\D/g, "").length >= 10;
+
   const placeOrder = async (paymentStatus: "paid" | "pending") => {
     setError("");
+    if (!phoneValid) {
+      setError("Enter a valid phone number so you can rate your order afterward.");
+      return;
+    }
     setIsProcessing(true);
     try {
       const res = await fetch("/api/orders", {
@@ -47,6 +59,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           cafeSlug,
           tableNumber,
+          customerPhone: phone,
           specialInstructions: instructions,
           items: cart,
           subtotal,
@@ -60,6 +73,8 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to place order");
 
+      localStorage.setItem("tabletop_phone", phone);
+      sessionStorage.setItem("tabletop_last_order", JSON.stringify({ orderId: data.orderId, phone }));
       clearCart();
       router.push(`/${cafeSlug}/order-status`);
     } catch (err: any) {
@@ -69,6 +84,11 @@ export default function CheckoutPage() {
   };
 
   const handleProceed = () => {
+    setError("");
+    if (!phoneValid) {
+      setError("Enter a valid phone number to continue.");
+      return;
+    }
     if (hasUpi) {
       setStep("payment");
     } else {
@@ -138,6 +158,13 @@ export default function CheckoutPage() {
 
           <div style={{ background: "#FDFBF9", padding: "24px", borderRadius: "24px", boxShadow: "0 12px 32px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.04)", marginBottom: "40px" }}>
             <h2 style={{ fontSize: "18px", margin: "0 0 16px 0" }}>Details</h2>
+            <input
+              type="tel"
+              placeholder="Phone Number (for order updates & ratings)"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              style={{ width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid #D5D1CB", marginBottom: "16px", fontSize: "16px", boxSizing: "border-box" }}
+            />
             <input
               type="text"
               placeholder="Table Number"

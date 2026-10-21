@@ -13,6 +13,7 @@ export type PaymentStatus = 'pending' | 'paid';
 export interface IOrder extends Document {
   cafe_id: mongoose.Types.ObjectId;
   tableNumber: string;
+  customerPhone?: string;
   items: IOrderItem[];
   subtotal: number;
   tax: number;
@@ -33,6 +34,7 @@ const OrderItemSchema = new Schema<IOrderItem>({
 const OrderSchema: Schema = new Schema({
   cafe_id: { type: Schema.Types.ObjectId, ref: 'Cafe', required: true },
   tableNumber: { type: String, default: '' },
+  customerPhone: { type: String, default: '' },
   items: { type: [OrderItemSchema], required: true },
   subtotal: { type: Number, required: true },
   tax: { type: Number, required: true },

@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
 import connectToDatabase from "./mongodb";
 import Cafe from "../models/Cafe";
 import MenuItem from "../models/MenuItem";
+import Rating from "../models/Rating";
 
 export type CafeData = {
   id: string;
@@ -21,6 +23,7 @@ export type MenuItemData = {
   description: string;
   image: string;
   type?: string;
+  rating?: RatingSummary;
 };
 
 export async function getCafeBySlug(slug: string): Promise<CafeData | null> {
@@ -38,4 +41,20 @@ export async function getMenuByCafeId(cafeId: string): Promise<MenuItemData[]> {
 
   const plain = JSON.parse(JSON.stringify(items));
   return plain.map((item: any) => ({ ...item, id: item._id }));
+}
+
+export type RatingSummary = { avgStars: number; count: number };
+
+export async function getRatingsByCafeId(cafeId: string): Promise<Record<string, RatingSummary>> {
+  await connectToDatabase();
+  const agg = await Rating.aggregate([
+    { $match: { cafe_id: new mongoose.Types.ObjectId(cafeId) } },
+    { $group: { _id: '$menuItemId', avgStars: { $avg: '$stars' }, count: { $sum: 1 } } },
+  ]);
+
+  const byItem: Record<string, RatingSummary> = {};
+  agg.forEach((a: any) => {
+    byItem[a._id.toString()] = { avgStars: Math.round(a.avgStars * 10) / 10, count: a.count };
+  });
+  return byItem;
 }

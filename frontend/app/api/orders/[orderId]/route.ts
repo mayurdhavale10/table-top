@@ -2,6 +2,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectToDatabase from '../../../../src/lib/mongodb';
 import Order from '../../../../src/models/Order';
 
+export async function GET(req: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
+  try {
+    const { orderId } = await params;
+
+    await connectToDatabase();
+
+    const order = await Order.findById(orderId).lean();
+    if (!order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    const plain = JSON.parse(JSON.stringify(order));
+    return NextResponse.json({ order: { ...plain, id: plain._id } });
+  } catch (error: any) {
+    console.error('Get Order Error:', error);
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  }
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
   try {
     const { orderId } = await params;
